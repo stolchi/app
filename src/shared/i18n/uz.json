@@ -1,0 +1,473 @@
+{
+  "brand": {
+    "name": "Stolchi",
+    "tagline": "Kafengiz uchun menyu, buyurtma va kassa",
+    "points": {
+      "menu": "Mijoz QR kodni skanerlaydi, menyuni ko'radi va buyurtma beradi",
+      "kitchen": "Buyurtma oshxona ekraniga darhol tushadi",
+      "pos": "Kassa, stollar va to'lovlar bir joyda"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Tizimga kirish",
+      "subtitle": "Telefon raqamingiz va parolingizni kiriting",
+      "submit": "Kirish",
+      "noAccount": "Kafengiz hali ro'yxatdan o'tmaganmi?",
+      "toRegister": "Ro'yxatdan o'tish"
+    },
+    "register": {
+      "title": "Kafeni ro'yxatdan o'tkazish",
+      "subtitle": "Kafe va egasining ma'lumotlarini kiriting",
+      "submit": "Ro'yxatdan o'tish",
+      "hasAccount": "Hisobingiz bormi?",
+      "toLogin": "Kirish"
+    },
+    "fields": {
+      "cafeName": "Kafe nomi",
+      "cafeNamePlaceholder": "Masalan, Oqtepa Kafe",
+      "ownerName": "Ismingiz",
+      "ownerNamePlaceholder": "Masalan, Aziz Karimov",
+      "phone": "Telefon raqam",
+      "password": "Parol",
+      "passwordHint": "Kamida 8 ta belgi"
+    },
+    "errors": {
+      "cafeNameRequired": "Kafe nomini kiriting",
+      "ownerNameRequired": "Ismingizni kiriting",
+      "phoneInvalid": "Raqamni +998901234567 ko'rinishida kiriting",
+      "passwordRequired": "Parolni kiriting",
+      "passwordTooShort": "Parol kamida 8 ta belgidan iborat bo'lsin",
+      "passwordTooLong": "Parol juda uzun",
+      "invalidCredentials": "Telefon raqam yoki parol noto'g'ri",
+      "phoneTaken": "Bu telefon raqam allaqachon ro'yxatdan o'tgan"
+    }
+  },
+  "common": {
+    "loading": "Yuklanmoqda...",
+    "errors": {
+      "network": "Serverga ulanib bo'lmadi. Internetni tekshirib, qayta urinib ko'ring",
+      "generic": "Xatolik yuz berdi. Qayta urinib ko'ring",
+      "forbidden": "Bu amal uchun ruxsatingiz yo'q",
+      "conflict": "Ma'lumot boshqa joyda o'zgargan. Ekran yangilandi, qayta urinib ko'ring",
+      "badImage": "Faqat JPEG, PNG yoki WebP rasm yuklash mumkin",
+      "imageTooLarge": "Rasm hajmi 5 MB dan oshmasin"
+    },
+    "money": "{{amount}} so'm",
+    "retry": "Qayta urinish",
+    "save": "Saqlash",
+    "saved": "Saqlandi",
+    "cancel": "Bekor qilish",
+    "delete": "O'chirish",
+    "enableSound": "Ovozli xabarni yoqish uchun bosing"
+  },
+  "nav": {
+    "dashboard": "Bugun",
+    "pos": "Kassa",
+    "waiter": "Buyurtma olish",
+    "kitchen": "Oshxona",
+    "orders": "Buyurtmalar",
+    "menu": "Menyu",
+    "tables": "Stollar va QR",
+    "staff": "Xodimlar",
+    "settings": "Sozlamalar"
+  },
+  "layout": {
+    "logout": "Chiqish",
+    "offline": "Aloqa yo'q",
+    "noCafe": "Platforma administratori paneli hali tayyor emas.",
+    "online": "Jonli aloqa bor",
+    "collapseMenu": "Menyuni yig'ish",
+    "expandMenu": "Menyuni ochish",
+    "noAccess": "Rolingizda hali hech qanday ruxsat yo'q. Kafe boshlig'iga murojaat qiling."
+  },
+  "roles": {
+    "SUPER_ADMIN": "Platforma administratori",
+    "OWNER": "Boshliq",
+    "CASHIER": "Kassir",
+    "WAITER": "Ofitsiant",
+    "COOK": "Oshpaz"
+  },
+  "menu": {
+    "categories": "Kategoriyalar",
+    "products": "Taomlar",
+    "addCategory": "Kategoriya qo'shish",
+    "editCategory": "Kategoriyani tahrirlash",
+    "addProduct": "Taom qo'shish",
+    "editProduct": "Taomni tahrirlash",
+    "noCategories": "Hali kategoriya yo'q. Masalan, \"Ichimliklar\" qo'shing",
+    "noProducts": "Bu kategoriyada hali taom yo'q",
+    "addCategoryFirst": "Avval kategoriya qo'shing",
+    "productCount": "{{value}} ta taom",
+    "available": "Bor",
+    "soldOut": "Tugadi",
+    "availableNamed": "{{name}} bor",
+    "dragToReorder": "Tartibni o'zgartirish uchun suring",
+    "editNamed": "{{name}}ni tahrirlash",
+    "deleteNamed": "{{name}}ni o'chirish",
+    "deleteNamedQuestion": "\"{{name}}\" o'chirilsinmi?",
+    "deleteProductNote": "Eski buyurtmalardagi nomi va narxi saqlanib qoladi.",
+    "imageHint": "JPEG, PNG yoki WebP, 5 MB gacha",
+    "fields": {
+      "categoryName": "Kategoriya nomi",
+      "isActive": "Menyuda ko'rsatilsin",
+      "productName": "Taom nomi",
+      "price": "Narxi (so'm)",
+      "category": "Kategoriya",
+      "description": "Tavsif",
+      "image": "Rasm"
+    },
+    "errors": {
+      "nameRequired": "Nomini kiriting",
+      "categoryRequired": "Kategoriyani tanlang",
+      "priceInvalid": "Narxni butun son bilan kiriting",
+      "categoryHasProducts": "Avval bu kategoriyadagi taomlarni o'chiring yoki boshqasiga o'tkazing"
+    }
+  },
+  "tables": {
+    "add": "Stol qo'shish",
+    "edit": "Stolni tahrirlash",
+    "empty": "Hali stol yo'q. Birinchi stolni qo'shing",
+    "downloadAll": "Barcha QR (PDF)",
+    "downloadQr": "QR yuklash",
+    "editNamed": "{{name}}ni tahrirlash",
+    "deleteNamed": "{{name}}ni o'chirish",
+    "deleteQuestion": "\"{{name}}\" o'chirilsinmi?",
+    "deleteNote": "Bu stolning QR kodi boshqa ishlamaydi.",
+    "fields": {
+      "name": "Stol nomi",
+      "namePlaceholder": "Masalan, Stol 1",
+      "zone": "Qavat yoki zona (ixtiyoriy)",
+      "zonePlaceholder": "Masalan, 2-qavat",
+      "prefix": "Stol nomi",
+      "defaultPrefix": "Stol",
+      "count": "Nechta stol",
+      "from": "Nechadan boshlab"
+    },
+    "errors": {
+      "nameRequired": "Stol nomini kiriting",
+      "nameTaken": "Bu nomli stol allaqachon bor",
+      "bulkInvalid": "Nomni kiriting; stollar soni 1 dan {{max}} gacha bo'lsin"
+    },
+    "busy": "Band",
+    "free": "Bo'sh",
+    "modeOne": "Bitta stol",
+    "modeMany": "Bir nechta stol",
+    "addMany": "{{count}} ta stol qo'shish",
+    "bulkPreview": "{{first}} dan {{last}} gacha, jami {{count}} ta stol qo'shiladi",
+    "freeHint": "Buyurtma yopilganda yoki bekor qilinganda stol o'zi bo'shaydi. Buyurtmani ochish uchun bosing."
+  },
+  "orders": {
+    "title": "#{{number}}",
+    "total": "Jami",
+    "unpaid": "Qolgan to'lov",
+    "amount": "Summa (so'm)",
+    "empty": "Bu shartlarga mos buyurtma topilmadi",
+    "takePayment": "To'lov qabul qilish",
+    "paymentTitle": "#{{number}} uchun to'lov",
+    "close": "Yopish",
+    "cancel": "Buyurtmani bekor qilish",
+    "cancelTitle": "#{{number}} bekor qilinsinmi?",
+    "cancelPaidWarning": "Bu buyurtma uchun {{amount}} to'langan. Pulni mijozga qaytarishni unutmang.",
+    "pageOf": "{{page}} / {{lastPage}}",
+    "previousPage": "Oldingi sahifa",
+    "nextPage": "Keyingi sahifa",
+    "status": {
+      "NEW": "Yangi",
+      "ACCEPTED": "Qabul qilindi",
+      "COOKING": "Tayyorlanmoqda",
+      "READY": "Tayyor",
+      "SERVED": "Berildi",
+      "PAID": "Yopilgan",
+      "CANCELLED": "Bekor qilingan"
+    },
+    "advance": {
+      "ACCEPTED": "Qabul qilish",
+      "COOKING": "Tayyorlashni boshlash",
+      "READY": "Tayyor",
+      "SERVED": "Mijozga berildi"
+    },
+    "type": {
+      "DINE_IN": "Stolda",
+      "TAKEAWAY": "Olib ketish",
+      "DELIVERY": "Yetkazib berish"
+    },
+    "source": {
+      "POS": "Kassa",
+      "QR": "QR",
+      "TELEGRAM": "Telegram"
+    },
+    "method": {
+      "CASH": "Naqd",
+      "CARD": "Karta",
+      "CLICK": "Click",
+      "PAYME": "Payme"
+    },
+    "filters": {
+      "date": "Sana",
+      "status": "Holati",
+      "source": "Manba",
+      "table": "Stol",
+      "all": "Hammasi",
+      "allStatuses": "Barchasi"
+    },
+    "columns": {
+      "time": "Vaqti",
+      "place": "Joyi",
+      "source": "Manba",
+      "status": "Holati"
+    },
+    "errors": {
+      "notFullyPaid": "Buyurtma to'liq to'lanmagan",
+      "badAmount": "1 so'mdan {{max}}gacha kiriting",
+      "belowPaid": "Buyurtma summasi to'langan summadan kam bo'lishi mumkin emas"
+    },
+    "closedMessage": "Buyurtma yopildi",
+    "moveTable": "Boshqa stolga ko'chirish",
+    "moveTitle": "#{{number}} qaysi stolga ko'chirilsin?",
+    "movedMessage": "#{{number}} ko'chirildi",
+    "edit": {
+      "action": "Tahrirlash",
+      "title": "#{{number}} buyurtmani tahrirlash",
+      "addProduct": "Taom qo'shish",
+      "search": "Taom qidirish",
+      "noResults": "Taom topilmadi",
+      "backToKitchen": "Qo'shilgan taomlar oshxonaga yuboriladi",
+      "empty": "Buyurtmada kamida bitta taom bo'lishi kerak. Butunlay kerak bo'lmasa, buyurtmani bekor qiling.",
+      "remove": "{{name}} ni olib tashlash",
+      "saved": "#{{number}} buyurtma o'zgartirildi"
+    },
+    "restLater": "Qolgan {{amount}} keyinroq olinadi",
+    "amountBy": "{{method}} bilan olinadigan summa (so'm)",
+    "tabs": {
+      "active": "Faol",
+      "history": "Tarix"
+    },
+    "active": {
+      "empty": "Hozir ochiq buyurtma yo'q",
+      "groups": {
+        "confirm": "Tasdiqlash kutilmoqda",
+        "finish": "Yakunlash kerak",
+        "kitchen": "Oshxonada"
+      },
+      "hours": "{{hours}} soat",
+      "days": "{{days}} kun",
+      "paid": "To'langan",
+      "notPaid": "To'lanmagan",
+      "partlyPaid": "{{amount}} qoldi",
+      "pay": "To'lov",
+      "open": "#{{number}} buyurtmani ochish"
+    },
+    "history": {
+      "empty": "Bu kunda yopilgan buyurtma yo'q"
+    }
+  },
+  "pos": {
+    "allCategories": "Hammasi",
+    "noProducts": "Bu yerda hali taom yo'q",
+    "emptyCart": "Savat bo'sh. Chapdan taom tanlang",
+    "chooseTable": "Stolni tanlang",
+    "chooseTableHint": "Yuborish uchun stolni tanlang",
+    "send": "Buyurtmani yuborish",
+    "noActiveOrders": "Hozir faol buyurtma yo'q",
+    "notePlaceholder": "Izoh",
+    "noteFor": "{{name}} uchun izoh",
+    "increase": "{{name}}ni ko'paytirish",
+    "decrease": "{{name}}ni kamaytirish",
+    "panels": {
+      "menu": "Menyu",
+      "cart": "Savat",
+      "orders": "Faol buyurtmalar",
+      "ordersShort": "Faol"
+    },
+    "errors": {
+      "productUnavailable": "Savatdagi taomlardan biri tugagan"
+    },
+    "sentMessage": "#{{number}} oshxonaga yuborildi",
+    "addToCart": "Savatga qo'shish",
+    "openCart": "Savatni ochish",
+    "itemsInCart": "{{count}} ta",
+    "tableBusy": "Band",
+    "tableFree": "Bo'sh",
+    "changeTable": "Stolni o'zgartirish",
+    "newOrderToast": "Yangi {{source}} buyurtma #{{number}}",
+    "dismiss": "Yopish",
+    "searchTable": "Stol yoki zonani qidiring",
+    "noTablesFound": "Bunday stol topilmadi",
+    "searchProduct": "Taomni qidiring",
+    "draft": "{{number}}-mijoz",
+    "newDraft": "Yangi mijoz",
+    "removeDraft": "{{name}} savatini o'chirish",
+    "removeDraftQuestion": "{{name}} savati o'chirilsinmi?"
+  },
+  "kitchen": {
+    "minutes": "{{minutes}} daqiqa",
+    "empty": "Bo'sh",
+    "columns": {
+      "new": "Yangi",
+      "cooking": "Tayyorlanmoqda",
+      "ready": "Tayyor"
+    },
+    "move": {
+      "COOKING": "Tayyorlashni boshlash",
+      "READY": "Tayyor",
+      "SERVED": "Mijozga berildi"
+    },
+    "dragHint": "Kartani bosib turib keyingi ustunga suring yoki tugmani bosing",
+    "added": "+{{count}} qo'shildi"
+  },
+  "dashboard": {
+    "title": "Bugungi ko'rsatkichlar",
+    "revenue": "Tushum",
+    "orders": "Buyurtmalar",
+    "activeTables": "Band stollar",
+    "topProducts": "Eng ko'p sotilganlar",
+    "noSales": "Bugun hali sotuv yo'q",
+    "live": "Jonli",
+    "sold": "{{quantity}} ta sotildi",
+    "startTitle": "Kafengizni ishga tushiramiz",
+    "startProgress": "{{done}} / {{total}} bajarildi",
+    "steps": {
+      "menu": "Menyuga kamida bitta taom qo'shing",
+      "tables": "Stollarni qo'shing va QR kodlarni chop eting",
+      "settings": "Telefon raqam yoki logotip qo'shing"
+    },
+    "revenueHint": "Bugun yopilgan buyurtmalardan",
+    "ordersHint": "Bugun olingan, bekor qilinganlarsiz",
+    "activeTablesHint": "Hozir buyurtmasi ochiq stollar",
+    "topProductsHint": "Bugun, sotilgan soni bo'yicha"
+  },
+  "settings": {
+    "sections": {
+      "cafe": "Kafe ma'lumotlari",
+      "logo": "Logotip",
+      "hours": "Ish vaqti",
+      "telegram": "Telegram bot",
+      "screen": "Mijozlar ekrani"
+    },
+    "fields": {
+      "name": "Kafe nomi",
+      "phone": "Telefon raqam",
+      "primaryColor": "Asosiy rang",
+      "address": "Manzil"
+    },
+    "logoAlt": "Kafe logotipi",
+    "chooseLogo": "Rasm tanlang (JPEG, PNG yoki WebP, 5 MB gacha)",
+    "closed": "Dam olish kuni",
+    "opensAt": "{{day}}: ochilish vaqti",
+    "closesAt": "{{day}}: yopilish vaqti",
+    "days": {
+      "mon": "Dushanba",
+      "tue": "Seshanba",
+      "wed": "Chorshanba",
+      "thu": "Payshanba",
+      "fri": "Juma",
+      "sat": "Shanba",
+      "sun": "Yakshanba"
+    },
+    "telegram": {
+      "token": "Bot tokeni",
+      "hint": "@BotFather bergan token. U shifrlab saqlanadi va boshqa ko'rsatilmaydi.",
+      "saved": "Token saqlangan. Bot keyingi yangilanishda ishga tushadi.",
+      "replace": "Tokenni almashtirish",
+      "invalid": "Bu Telegram bot tokeniga o'xshamaydi"
+    },
+    "errors": {
+      "nameRequired": "Kafe nomini kiriting"
+    },
+    "colorHint": "Tanlangan rang saqlangach butun panelga qo'llanadi",
+    "preview": "Namuna tugma",
+    "screen": {
+      "hint": "Bu sahifani mijozlar ko'radigan monitorda oching. Unga kirish uchun login kerak emas va unda faqat buyurtma raqamlari ko'rinadi.",
+      "open": "Ekranni ochish"
+    }
+  },
+  "shortcuts": {
+    "title": "Tezkor tugmalar",
+    "toggleMenu": "Menyuni yig'ish yoki ochish",
+    "pages": "Sahifalar orasida o'tish",
+    "help": "Shu ro'yxatni ochish",
+    "searchProduct": "Taom qidiruviga o'tish",
+    "addFirst": "Topilgan birinchi taomni savatga qo'shish",
+    "chooseTable": "Stol tanlash",
+    "orderType": "Stolda yoki olib ketish",
+    "cartOrOrders": "Savat yoki faol buyurtmalar",
+    "send": "Buyurtmani yuborish",
+    "newDraft": "Keyingi mijozga o'tish"
+  },
+  "waiter": {
+    "mine": "Mening buyurtmalarim",
+    "all": "Hammasi",
+    "readyToast": "#{{number}} tayyor, olib boring"
+  },
+  "screen": {
+    "preparing": "Tayyorlanmoqda",
+    "ready": "Tayyor",
+    "hint": "Raqamingiz «Tayyor» ustunida chiqsa, kassadan olib keting",
+    "nothingPreparing": "Hozircha buyurtma yo'q",
+    "nothingReady": "Tayyor buyurtma yo'q",
+    "notFound": "Bunday kafe topilmadi"
+  },
+  "staff": {
+    "tabs": {
+      "members": "Xodimlar",
+      "roles": "Rollar"
+    },
+    "addMember": "Xodim qo'shish",
+    "editMember": "Xodimni tahrirlash",
+    "noMembers": "Hali xodim yo'q",
+    "inactive": "Faol emas",
+    "you": "Siz",
+    "fields": {
+      "name": "Ismi",
+      "phone": "Telefon raqam (login)",
+      "password": "Parol",
+      "newPassword": "Yangi parol",
+      "newPasswordHint": "O'zgartirmasangiz, bo'sh qoldiring",
+      "role": "Rol",
+      "active": "Faol",
+      "activeHint": "Faol bo'lmagan xodim tizimga kira olmaydi. Buyurtmalar tarixi saqlanib qoladi.",
+      "roleName": "Rol nomi"
+    },
+    "addRole": "Yangi rol",
+    "editRole": "{{name}} rolini tahrirlash",
+    "newRole": "Yangi rol",
+    "roleLocked": "Boshliq har doim barcha ruxsatlarga ega, buni o'zgartirib bo'lmaydi.",
+    "defaultRole": "Standart rol",
+    "memberCount": "{{count}} ta xodim",
+    "permissionCount": "{{count}} ta ruxsat",
+    "deleteRole": "{{name}} rolini o'chirish",
+    "deleteRoleQuestion": "{{name}} roli o'chirilsinmi?",
+    "editRoleNamed": "{{name}} rolini tahrirlash",
+    "editMemberNamed": "{{name}} ni tahrirlash",
+    "groups": {
+      "orders": "Buyurtmalar",
+      "kitchen": "Oshxona",
+      "menu": "Menyu",
+      "management": "Boshqaruv"
+    },
+    "errors": {
+      "nameRequired": "Ismni kiriting",
+      "roleNameRequired": "Rol nomini kiriting",
+      "roleRequired": "Rolni tanlang",
+      "roleNameTaken": "Bunday nomli rol allaqachon bor",
+      "roleHasStaff": "Bu rolda xodimlar bor. Avval ularga boshqa rol bering.",
+      "lastOwner": "Kafeda kamida bitta boshliq qolishi kerak"
+    }
+  },
+  "permissions": {
+    "DASHBOARD_VIEW": "Bugungi ko'rsatkichlarni ko'rish",
+    "ORDERS_VIEW": "Buyurtmalarni ko'rish",
+    "ORDERS_CREATE": "Buyurtma olish",
+    "ORDERS_EDIT": "Buyurtmani o'zgartirish va stolini almashtirish",
+    "ORDERS_CANCEL": "Buyurtmani bekor qilish",
+    "ORDERS_SERVE": "\"Berildi\" deb belgilash",
+    "ORDERS_PAYMENT": "To'lov qabul qilish va buyurtmani yopish",
+    "KITCHEN_WORK": "Oshxona ekrani: qabul qilish, tayyorlash, tayyor deb belgilash",
+    "MENU_AVAILABILITY": "Taomni \"tugadi\" deb belgilash",
+    "MENU_MANAGE": "Menyuni boshqarish",
+    "TABLES_MANAGE": "Stollar va QR kodlarni boshqarish",
+    "SETTINGS_MANAGE": "Kafe sozlamalarini o'zgartirish",
+    "STAFF_MANAGE": "Xodimlar va rollarni boshqarish"
+  }
+}
