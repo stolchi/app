@@ -36,6 +36,7 @@ import { LoadingBlocks } from '@/shared/ui/QueryState';
 import { useSidebarStore } from '@/shared/ui/sidebar-store';
 import { navItemsFor } from './nav';
 import { useCafeFeatures } from './use-cafe-features';
+import { useUnseenOrders } from '@/features/orders/unseen';
 
 function useSignOut() {
   const signOut = useSessionStore((state) => state.signOut);
@@ -51,7 +52,30 @@ function useSignOut() {
   });
 }
 
-function SideNavigation() {
+type Badges = Partial<Record<string, number>>;
+
+/** A pulsing count of new customer orders, so they are not missed from any page. */
+function NavBadge({ count, dot = false }: { count?: number; dot?: boolean }) {
+  const { t } = useTranslation();
+  if (!count) return null;
+  return (
+    <span
+      role="status"
+      aria-label={t('orders.unseen.count', { count })}
+      className={cn(
+        'relative flex items-center justify-center rounded-full bg-amber-400 font-bold text-amber-950 shadow-md',
+        dot
+          ? 'absolute -top-1 -right-1 size-5 text-[0.65rem]'
+          : 'ml-auto size-6 text-xs',
+      )}
+    >
+      <span className="absolute inset-0 animate-ping rounded-full bg-amber-400 opacity-60 motion-reduce:hidden" />
+      <span className="relative">{count}</span>
+    </span>
+  );
+}
+
+function SideNavigation({ badges }: { badges: Badges }) {
   const { t } = useTranslation();
   const permissions = usePermissions();
   const features = useCafeFeatures();
@@ -97,8 +121,12 @@ function SideNavigation() {
                   className="absolute inset-0 rounded-xl bg-sidebar-primary shadow-lg shadow-black/20"
                 />
               )}
-              <Icon className="relative size-5 shrink-0" />
+              <span className="relative">
+                <Icon className="size-5 shrink-0" />
+                {collapsed && <NavBadge count={badges[path]} dot />}
+              </span>
               {!collapsed && <span className="relative">{t(label)}</span>}
+              {!collapsed && <NavBadge count={badges[path]} />}
             </>
           )}
         </NavLink>
@@ -184,7 +212,7 @@ function ShortcutsDialog({
 }
 
 /** Within reach of the thumb. Scrolls sideways when a role has many pages. */
-function BottomNavigation() {
+function BottomNavigation({ badges }: { badges: Badges }) {
   const { t } = useTranslation();
   const permissions = usePermissions();
   const features = useCafeFeatures();
@@ -225,7 +253,10 @@ function BottomNavigation() {
                   className="absolute inset-x-1.5 inset-y-0.5 rounded-xl bg-primary/10"
                 />
               )}
-              <Icon className="relative size-5" />
+              <span className="relative">
+                <Icon className="size-5" />
+                <NavBadge count={badges[path]} dot />
+              </span>
               <span className="relative whitespace-nowrap">{t(label)}</span>
             </>
           )}
@@ -335,6 +366,8 @@ export function AppLayout() {
   const { pathname } = useLocation();
   // A cook has one screen, and it needs all the room it can get.
   const items = navItemsFor(permissions, features);
+  // Once, here: it also rings while new orders wait.
+  const badges = useUnseenOrders();
   const hasMenu = items.length > 1;
   const navigate = useNavigate();
   const toggleSidebar = useSidebarStore((state) => state.toggle);
@@ -354,7 +387,7 @@ export function AppLayout() {
   return (
     <RealtimeProvider>
       <div className="flex h-dvh">
-        {hasMenu && <SideNavigation />}
+        {hasMenu && <SideNavigation badges={badges} />}
         <div className="flex min-w-0 flex-1 flex-col">
           <TopBar onShowShortcuts={() => setShowShortcuts(true)} />
           <main className="min-h-0 flex-1 overflow-auto">
@@ -370,7 +403,7 @@ export function AppLayout() {
               </motion.div>
             </Suspense>
           </main>
-          {hasMenu && <BottomNavigation />}
+          {hasMenu && <BottomNavigation badges={badges} />}
         </div>
       </div>
       <Celebration />

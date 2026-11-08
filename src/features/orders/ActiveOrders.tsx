@@ -9,8 +9,9 @@ import { QueryState } from '@/shared/ui/QueryState';
 import { groupActiveOrders } from './active-groups';
 import { ActiveOrderCard } from './ActiveOrderCard';
 import { useTables } from './use-tables';
+import { ACTIVE_QUERY } from './unseen';
 
-export const ACTIVE_QUERY = { active: true, limit: 100 } as const;
+export { ACTIVE_QUERY };
 
 /** Orders still open, sorted by what they need from someone right now. */
 export function ActiveOrders({ onOpen }: { onOpen: (id: string) => void }) {

@@ -54,11 +54,12 @@ const delivery = (id: string, number: number, status: string) => ({
     },
   ],
   payments: [],
+  seenAt: '2026-01-31T10:00:00Z',
 });
 
 function show({
   orderTypes = ['DINE_IN', 'TAKEAWAY', 'DELIVERY'],
-  orders = [delivery('a', 1, 'NEW'), delivery('b', 2, 'READY')],
+  orders = [delivery('a', 1, 'NEW'), delivery('b', 2, 'READY')] as object[],
 } = {}) {
   const sent: { path: string; body: unknown }[] = [];
   vi.stubGlobal(
@@ -71,11 +72,17 @@ function show({
           headers: { 'Content-Type': 'application/json' },
         });
       if (init?.method && init.method !== 'GET') {
-        sent.push({ path: url.pathname, body: JSON.parse(String(init.body)) });
+        sent.push({
+          path: url.pathname,
+          body: init.body ? JSON.parse(String(init.body)) : {},
+        });
         return json(orders[0]);
       }
       if (url.pathname.endsWith('/cafes/current')) return json({ orderTypes });
       if (url.pathname.endsWith('/tables')) return json([]);
+      if (url.pathname.endsWith('/couriers')) {
+        return json([{ id: 'c1', name: 'Ali', activeDeliveries: 2 }]);
+      }
       return json({ items: orders, total: orders.length, page: 1, limit: 100 });
     }),
   );
@@ -145,6 +152,65 @@ describe('DeliveryPage', () => {
       { path: '/api/v1/orders/a/status', body: { status: 'ACCEPTED' } },
       { path: '/api/v1/orders/b/status', body: { status: 'SERVED' } },
     ]);
+  });
+
+  it('marks a new order until someone looks at it', async () => {
+    const sent = show({
+      orders: [{ ...delivery('a', 1, 'NEW'), seenAt: null }],
+    });
+    const waiting = await screen.findByRole('region', {
+      name: uz.delivery.groups.waiting,
+    });
+    expect(within(waiting).getByText(uz.orders.unseen.badge)).toBeVisible();
+    await userEvent.click(
+      within(waiting).getByRole('button', { name: uz.orders.unseen.markSeen }),
+    );
+    await waitFor(() =>
+      expect(sent).toEqual([{ path: '/api/v1/orders/a/seen', body: {} }]),
+    );
+  });
+
+  it('gives a ready delivery to a courier', async () => {
+    const sent = show();
+    const ready = await screen.findByRole('region', {
+      name: uz.delivery.groups.ready,
+    });
+    // Ready, and nobody is coming for it yet: that has to be seen.
+    expect(within(ready).getByText(uz.courier.waitingNobody)).toBeVisible();
+    const picker = within(ready).getByLabelText(uz.courier.assign);
+    await waitFor(() => expect(picker).toBeEnabled());
+    expect(
+      within(ready).getByRole('option', { name: 'Ali (2 ta yetkazishda)' }),
+    ).toBeInTheDocument();
+    await userEvent.selectOptions(picker, 'c1');
+    await waitFor(() => expect(sent).toHaveLength(1));
+    expect(sent[0]).toEqual({
+      path: '/api/v1/orders/b/courier',
+      body: { courierId: 'c1' },
+    });
+  });
+
+  it('shows who is coming for it, and when a courier on the way will arrive', async () => {
+    show({
+      orders: [
+        { ...delivery('b', 2, 'READY'), courier: { id: 'c1', name: 'Ali' } },
+        {
+          ...delivery('c', 3, 'SERVED'),
+          courier: { id: 'c1', name: 'Ali' },
+          deliveryEta: '2026-01-31T10:30:00Z',
+        },
+      ],
+    });
+    expect(
+      await screen.findByText(uz.courier.waitingFor.replace('{{name}}', 'Ali')),
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        uz.courier.onTheWay
+          .replace('{{name}}', 'Ali')
+          .replace('{{time}}', '15:30'),
+      ),
+    ).toBeVisible();
   });
 
   it('cancels with a reason for the customer', async () => {

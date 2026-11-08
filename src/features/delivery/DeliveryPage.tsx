@@ -11,6 +11,12 @@ import { ContactDialog } from '@/features/orders/ContactDialog';
 import { CustomerDetails } from '@/features/orders/CustomerDetails';
 import { OrderDialog } from '@/features/orders/OrderDialog';
 import { OrderEditDialog } from '@/features/orders/OrderEditDialog';
+import {
+  MarkSeenButton,
+  UnseenChip,
+  unseenCard,
+} from '@/features/orders/UnseenMark';
+import { isUnseen, useMarkSeen } from '@/features/orders/unseen';
 import { ACTIVE_QUERY } from '@/features/orders/ActiveOrders';
 import { elapsed } from '@/features/orders/active-groups';
 import {
@@ -27,7 +33,7 @@ import type { OrderDto } from '@/shared/api/generated/model';
 import { ApiPath, invalidate } from '@/shared/api/invalidate';
 import { usePermissions } from '@/shared/auth/session-store';
 import { playChime } from '@/shared/lib/chime';
-import { formatMoney } from '@/shared/lib/format';
+import { formatMoney, formatTime as formatClock } from '@/shared/lib/format';
 import { quantityLabel } from '@/shared/lib/quantity';
 import { useMinutesSince } from '@/shared/lib/use-minutes-since';
 import { SPRING } from '@/shared/motion/variants';
@@ -38,6 +44,7 @@ import { ErrorText } from '@/shared/ui/ErrorText';
 import { Page } from '@/shared/ui/Page';
 import { QueryState } from '@/shared/ui/QueryState';
 import { SoundHint } from '@/shared/ui/SoundHint';
+import { CourierPicker } from './CourierPicker';
 import {
   groupDeliveries,
   overdue,
@@ -50,6 +57,50 @@ const NEXT: Partial<Record<DeliveryGroup, 'ACCEPTED' | 'SERVED'>> = {
   waiting: 'ACCEPTED',
   ready: 'SERVED',
 };
+
+/** Who is taking it, so a ready order waiting for nobody stands out. */
+function CourierState({
+  order,
+  group,
+}: {
+  order: OrderDto;
+  group: DeliveryGroup;
+}) {
+  const { t } = useTranslation();
+  const name = order.courier?.name;
+  if (group === 'onTheWay') {
+    if (!name) return null;
+    return (
+      <p className="rounded-xl bg-sky-50 p-2.5 text-sm font-medium text-sky-900">
+        {order.deliveryEta
+          ? t('courier.onTheWay', {
+              name,
+              time: formatClock(order.deliveryEta),
+            })
+          : t('courier.onTheWayNoEta', { name })}
+      </p>
+    );
+  }
+  if (!name) {
+    return (
+      <p
+        className={cn(
+          'rounded-xl p-2.5 text-sm font-semibold',
+          group === 'ready'
+            ? 'bg-destructive/10 text-destructive'
+            : 'bg-muted text-muted-foreground',
+        )}
+      >
+        {t('courier.waitingNobody')}
+      </p>
+    );
+  }
+  return (
+    <p className="rounded-xl bg-emerald-50 p-2.5 text-sm font-semibold text-emerald-900">
+      {t('courier.waitingFor', { name })}
+    </p>
+  );
+}
 
 function DeliveryCard({
   order,
@@ -75,6 +126,7 @@ function DeliveryCard({
     },
   });
   const waiting = group === 'waiting';
+  const markSeen = useMarkSeen();
   const next = NEXT[group];
   const time = elapsed(minutes);
 
@@ -84,17 +136,22 @@ function DeliveryCard({
         'space-y-3 rounded-2xl border bg-card p-4 shadow-xs',
         waiting && 'border-2 border-primary/60',
         waiting && minutes >= REMIND_AFTER_MINUTES && 'border-destructive',
+        isUnseen(order) && unseenCard,
       )}
     >
       <header className="flex items-center justify-between gap-2">
         <button
           type="button"
-          onClick={onOpen}
+          onClick={() => {
+            markSeen(order);
+            onOpen();
+          }}
           className="font-heading text-2xl font-bold outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
           aria-label={t('orders.active.open', { number: order.displayNumber })}
         >
           {t('orders.title', { number: order.displayNumber })}
         </button>
+        <UnseenChip order={order} />
         <span
           className={cn(
             'rounded-full px-2.5 py-1 text-xs font-semibold',
@@ -107,6 +164,11 @@ function DeliveryCard({
         </span>
       </header>
       <CustomerDetails order={order} />
+      {!waiting && <CourierState order={order} group={group} />}
+      {/* Given to a courier once it is agreed, until they leave with it. */}
+      {(group === 'cooking' || group === 'ready') && mayEdit(permissions) && (
+        <CourierPicker order={order} />
+      )}
       {waiting && (
         <ul className="space-y-0.5 text-sm">
           {order.items.map((item) => (
@@ -150,15 +212,18 @@ function DeliveryCard({
             className="h-12 text-base"
             disabled={change.isPending}
             onClick={() =>
+              // Acting on it is seeing it.
               change.mutate(
                 { id: order.id, data: { status: next } },
                 {
-                  onSuccess: () =>
+                  onSuccess: () => {
+                    markSeen(order);
                     celebrate(
                       t(`delivery.done.${next}`, {
                         number: order.displayNumber,
                       }),
-                    ),
+                    );
+                  },
                 },
               )
             }
@@ -174,8 +239,14 @@ function DeliveryCard({
           </Button>
         )}
       </div>
+      {isUnseen(order) && !waiting && (
+        <div className="flex">
+          <MarkSeenButton order={order} />
+        </div>
+      )}
       {waiting && (
         <div className="flex flex-wrap gap-2">
+          <MarkSeenButton order={order} />
           {mayEdit(permissions) && (
             <>
               <Button

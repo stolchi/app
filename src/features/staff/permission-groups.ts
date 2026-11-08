@@ -14,10 +14,11 @@ const {
   TABLES_MANAGE,
   SETTINGS_MANAGE,
   STAFF_MANAGE,
+  DELIVERY_COURIER,
 } = Permission;
 
 export const PERMISSION_GROUPS: readonly {
-  id: 'orders' | 'kitchen' | 'menu' | 'management';
+  id: 'orders' | 'kitchen' | 'delivery' | 'menu' | 'management';
   permissions: readonly Permission[];
 }[] = [
   {
@@ -32,6 +33,7 @@ export const PERMISSION_GROUPS: readonly {
     ],
   },
   { id: 'kitchen', permissions: [KITCHEN_WORK] },
+  { id: 'delivery', permissions: [DELIVERY_COURIER] },
   { id: 'menu', permissions: [MENU_AVAILABILITY, MENU_MANAGE] },
   {
     id: 'management',

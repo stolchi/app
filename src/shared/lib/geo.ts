@@ -3,6 +3,12 @@ export interface Point {
   longitude: number;
 }
 
+/** Just the coordinates, which is all the API takes as a location. */
+export const pointOf = ({ latitude, longitude }: Point): Point => ({
+  latitude,
+  longitude,
+});
+
 /** Tashkent: where the map opens when there is no point yet. */
 export const DEFAULT_CENTER: Point = {
   latitude: 41.311081,

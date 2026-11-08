@@ -67,4 +67,8 @@ describe('permission-based menu', () => {
       navItemsFor([ORDERS_VIEW], { delivery: true }).map((item) => item.path),
     ).toEqual(['/orders', '/delivery']);
   });
+
+  it('has no page for a courier: they use the courier site', () => {
+    expect(navItemsFor([Permission.DELIVERY_COURIER])).toEqual([]);
+  });
 });

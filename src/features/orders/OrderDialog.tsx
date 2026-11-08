@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowRightLeft, Pencil, UserPen } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,6 +37,7 @@ import { CancelOrderDialog } from './CancelOrderDialog';
 import { ContactDialog } from './ContactDialog';
 import { CustomerDetails } from './CustomerDetails';
 import { OrderAmounts } from './OrderAmounts';
+import { useMarkSeen } from './unseen';
 import { OrderEditDialog } from './OrderEditDialog';
 import { PaymentDialog } from './PaymentDialog';
 import { TablePicker } from './TablePicker';
@@ -284,6 +285,12 @@ export function OrderDialog({
   const order = useOrdersControllerGet(shownId ?? '', {
     query: { enabled: shownId !== null },
   });
+  const markSeen = useMarkSeen();
+  // Opening a customer's order is seeing it, for everyone at the cafe.
+  const loaded = orderId !== null ? order.data : undefined;
+  useEffect(() => {
+    if (loaded) markSeen(loaded);
+  }, [loaded, markSeen]);
 
   return (
     <Dialog

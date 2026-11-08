@@ -43,6 +43,7 @@ const order = (
     },
   ],
   payments: [],
+  seenAt: '2026-01-31T10:00:00Z',
   createdAt,
 });
 

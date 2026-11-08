@@ -8,6 +8,7 @@ export const ApiPath = {
   tables: '/api/v1/tables',
   cafe: '/api/v1/cafes/current',
   staff: '/api/v1/staff',
+  couriers: '/api/v1/couriers',
 } as const;
 
 /** Refetches every query, lists and single items alike, under the given API paths. */

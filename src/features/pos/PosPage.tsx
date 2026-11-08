@@ -38,6 +38,7 @@ import type { OrderDto, ProductDto } from '@/shared/api/generated/model';
 import { ApiPath, invalidate } from '@/shared/api/invalidate';
 import { usePermissions, useSessionStore } from '@/shared/auth/session-store';
 import { playChime } from '@/shared/lib/chime';
+import { pointOf } from '@/shared/lib/geo';
 import { normalizePhone } from '@/shared/lib/phone';
 import { useShortcuts } from '@/shared/lib/use-shortcuts';
 import { formatMoney, formatTime } from '@/shared/lib/format';
@@ -59,8 +60,7 @@ import { flyToCart } from './fly-to-cart';
 import { DeliveryFields, deliveryReady } from './DeliveryFields';
 import { useCartAmounts } from './use-cart-amounts';
 import { VariantPicker } from './VariantPicker';
-
-const ACTIVE_ORDERS = { active: true, limit: 100 } as const;
+import { ACTIVE_QUERY as ACTIVE_ORDERS } from '@/features/orders/unseen';
 
 /** How much of a product the cart holds: pieces, or the weight. */
 function useInCart(product: ProductDto): string | undefined {
@@ -204,7 +204,7 @@ function Cart({
             customerPhone: normalizePhone(cart.customer.phone),
             address: cart.customer.address.trim(),
             ...(cart.customer.location && {
-              location: cart.customer.location,
+              location: pointOf(cart.customer.location),
             }),
             ...(cart.customer.name.trim() && {
               customerName: cart.customer.name.trim(),

@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { LocationDto } from './locationDto';
+import type { OrderCourierDto } from './orderCourierDto';
 import type { OrderItemDto } from './orderItemDto';
 import type { OrderSource } from './orderSource';
 import type { OrderStatus } from './orderStatus';
@@ -41,6 +42,18 @@ export interface OrderDto {
   location: LocationDto | null;
   /** @nullable */
   cancelReason: string | null;
+  /**
+     * Empty until someone at the cafe has opened it.
+     * @nullable
+     */
+  seenAt: string | null;
+  /**
+     * When the courier on the way expects to hand it over.
+     * @nullable
+     */
+  deliveryEta: string | null;
+  /** @nullable */
+  courier: OrderCourierDto | null;
   paidAmount: number;
   /** @nullable */
   note: string | null;

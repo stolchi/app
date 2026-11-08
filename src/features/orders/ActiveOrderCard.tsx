@@ -17,6 +17,8 @@ import { ErrorText } from '@/shared/ui/ErrorText';
 import { elapsed } from './active-groups';
 import { maySetStatus, mayTakePayment, nextStatus } from './order-rules';
 import { PaymentDialog } from './PaymentDialog';
+import { isUnseen, useMarkSeen } from './unseen';
+import { MarkSeenButton, UnseenChip, unseenCard } from './UnseenMark';
 import { SourceBadge } from './SourceBadge';
 import { StatusBadge } from './StatusBadge';
 
@@ -51,6 +53,7 @@ export function ActiveOrderCard({
   const queryClient = useQueryClient();
   const permissions = usePermissions();
   const [paying, setPaying] = useState(false);
+  const markSeen = useMarkSeen();
   // On failure too: a conflict means this screen is behind someone else's change.
   const mutation = {
     mutation: {
@@ -76,11 +79,19 @@ export function ActiveOrderCard({
   const time = elapsed(minutes);
 
   return (
-    <article className="flex h-full flex-col rounded-2xl border bg-card shadow-xs">
+    <article
+      className={cn(
+        'flex h-full flex-col rounded-2xl border bg-card shadow-xs',
+        isUnseen(order) && unseenCard,
+      )}
+    >
       <button
         type="button"
         aria-label={t('orders.active.open', { number: order.displayNumber })}
-        onClick={onOpen}
+        onClick={() => {
+          markSeen(order);
+          onOpen();
+        }}
         className="flex-1 space-y-2 rounded-t-2xl p-3.5 text-left outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         <span className="flex items-center justify-between gap-2">
@@ -89,8 +100,9 @@ export function ActiveOrderCard({
               {t('orders.title', { number: order.displayNumber })}
             </span>
             <SourceBadge source={order.source} />
+            <UnseenChip order={order} />
           </span>
-          <StatusBadge status={order.status} />
+          <StatusBadge status={order.status} type={order.type} />
         </span>
         <span className="block text-sm text-muted-foreground">
           {place} · {t(time.key, time.values)}
@@ -110,10 +122,11 @@ export function ActiveOrderCard({
           </span>
         </span>
       </button>
-      {(mayAdvance || mayPay || mayClose) && (
+      {(mayAdvance || mayPay || mayClose || isUnseen(order)) && (
         <div className="space-y-2 border-t p-2.5">
           <ErrorText error={changeStatus.error ?? close.error} />
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <MarkSeenButton order={order} />
             {mayAdvance && (
               <Button
                 variant="secondary"

@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useOrdersControllerUpdateCustomer } from '@/shared/api/generated/orders/orders';
 import type { OrderDto } from '@/shared/api/generated/model';
 import { ApiPath, invalidate } from '@/shared/api/invalidate';
+import { pointOf } from '@/shared/lib/geo';
 import { normalizePhone, PHONE_PATTERN } from '@/shared/lib/phone';
 import { ErrorText } from '@/shared/ui/ErrorText';
 import { FormField } from '@/shared/ui/FormField';
@@ -62,7 +63,10 @@ function ContactForm({
             data: {
               customerPhone: normalPhone || null,
               customerName: name.trim() || null,
-              ...(delivery && { address: address.trim(), location }),
+              ...(delivery && {
+                address: address.trim(),
+                location: location && pointOf(location),
+              }),
             },
           },
           { onSuccess: onDone },

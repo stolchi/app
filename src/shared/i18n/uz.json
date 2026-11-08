@@ -87,7 +87,8 @@
     "OWNER": "Boshliq",
     "CASHIER": "Kassir",
     "WAITER": "Ofitsiant",
-    "COOK": "Oshpaz"
+    "COOK": "Oshpaz",
+    "COURIER": "Kuryer"
   },
   "menu": {
     "categories": "Kategoriyalar",
@@ -301,7 +302,12 @@
     "deliveryAdvance": {
       "SERVED": "Kuryerga berildi"
     },
-    "cancelledBecause": "Bekor qilish sababi: {{reason}}"
+    "cancelledBecause": "Bekor qilish sababi: {{reason}}",
+    "unseen": {
+      "count": "{{count}} ta yangi buyurtma",
+      "badge": "Yangi",
+      "markSeen": "Ko'rdim"
+    }
   },
   "pos": {
     "allCategories": "Hammasi",
@@ -521,6 +527,7 @@
     "groups": {
       "orders": "Buyurtmalar",
       "kitchen": "Oshxona",
+      "delivery": "Yetkazib berish",
       "menu": "Menyu",
       "management": "Boshqaruv"
     },
@@ -546,7 +553,8 @@
     "MENU_MANAGE": "Menyuni boshqarish",
     "TABLES_MANAGE": "Stollar va QR kodlarni boshqarish",
     "SETTINGS_MANAGE": "Kafe sozlamalarini o'zgartirish",
-    "STAFF_MANAGE": "Xodimlar va rollarni boshqarish"
+    "STAFF_MANAGE": "Xodimlar va rollarni boshqarish",
+    "DELIVERY_COURIER": "Kuryer: o'ziga berilgan yetkazishlarni olib borish va pulini olish"
   },
   "weight": {
     "title": "{{name}}: og'irligi",
@@ -589,11 +597,8 @@
   },
   "location": {
     "title": "Xaritada manzil",
-    "hint": "Xaritada bosing yoki mijoz yuborgan Yandex/Google xarita havolasini joylang. Belgini surib aniqlashtirish mumkin.",
-    "link": "Xarita havolasi yoki koordinata",
-    "linkPlaceholder": "Havola yoki 41.31, 69.24",
-    "put": "Qo'yish",
-    "unreadable": "Bu havoladan nuqtani o'qib bo'lmadi. Qisqa havolani brauzerda ochib, to'liq havolani nusxalang yoki xaritada bosing.",
+    "hint": "Joy nomini yozing (masalan \"Farg'ona, Mustaqillik\"), mijoz yuborgan xarita havolasini joylang yoki xaritada bosing. Belgini surib aniqlashtiring.",
+    "unreadable": "Bu yozuvdan joy topilmadi. Qisqa havolani brauzerda ochib, to'liq havolani nusxalang yoki xaritada bosing.",
     "map": "Xarita: nuqtani belgilash uchun bosing",
     "tapHint": "Nuqta tanlanmagan: xaritada bosing",
     "remove": "Nuqtani olib tashlash",
@@ -609,6 +614,23 @@
     "qrHint": "Kuryer telefoni kamerasi bilan skanerlasin: Yandex Xaritada yo'l ochiladi.",
     "share": "Kuryerga yuborish",
     "copied": "Kuryer uchun matn nusxalandi",
-    "noPoint": "Xaritada nuqta yo'q"
+    "noPoint": "Xaritada nuqta yo'q",
+    "search": "Manzil, joy nomi yoki xarita havolasi",
+    "searchPlaceholder": "Joy nomi, havola yoki 41.31, 69.24",
+    "results": "Topilgan joylar",
+    "searching": "Qidirilmoqda...",
+    "searchFailed": "Qidiruv hozir ishlamayapti. Xaritada bosib belgilang.",
+    "nothingFound": "Hech narsa topilmadi. Boshqacha yozing yoki xaritada bosing."
+  },
+  "courier": {
+    "assign": "Kuryer",
+    "nobody": "Kuryer tanlanmagan",
+    "noCouriers": "Kuryer yo'q: Xodimlar sahifasida \"Kuryer\" rolida xodim qo'shing",
+    "carrying": "{{name}} ({{count}} ta yetkazishda)",
+    "assigned": "#{{number}}: {{name}}ga berildi",
+    "waitingNobody": "Kuryer hali olmagan",
+    "waitingFor": "{{name}} kelib olishi kutilmoqda",
+    "onTheWay": "{{name}} yo'lda, taxminan {{time}} gacha",
+    "onTheWayNoEta": "{{name}} yo'lda"
   }
 }

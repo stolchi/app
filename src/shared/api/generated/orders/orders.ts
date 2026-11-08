@@ -26,8 +26,10 @@ import type {
 import type {
   AddPaymentDto,
   AddPaymentsDto,
+  AssignCourierDto,
   CancelOrderDto,
   ChangeStatusDto,
+  CourierSummaryDto,
   CreateOrderDto,
   MoveOrderDto,
   OrderDto,
@@ -510,6 +512,167 @@ export const useOrdersControllerUpdateItems = <TError = unknown,
         TContext
       > => {
       return useMutation(getOrdersControllerUpdateItemsMutationOptions(options), queryClient);
+    }
+    export const getOrdersControllerMarkSeenUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/orders/${id}/seen`
+}
+
+/**
+ * @summary Mark that someone at the cafe has looked at it
+ */
+export const ordersControllerMarkSeen = async (id: string, options?: Parameters<typeof apiFetch>[1]): Promise<OrderDto> => {
+
+  return apiFetch<OrderDto>(getOrdersControllerMarkSeenUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getOrdersControllerMarkSeenMutationKey = () => ['ordersControllerMarkSeen'] as const;
+
+export const getOrdersControllerMarkSeenMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerMarkSeen>>, TError,OrdersControllerMarkSeenMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ordersControllerMarkSeen>>, TError,OrdersControllerMarkSeenMutationVariables, TContext> => {
+
+const mutationKey = getOrdersControllerMarkSeenMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ordersControllerMarkSeen>>, OrdersControllerMarkSeenMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  ordersControllerMarkSeen(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrdersControllerMarkSeenMutationResult = NonNullable<Awaited<ReturnType<typeof ordersControllerMarkSeen>>>
+
+    export type OrdersControllerMarkSeenMutationError = unknown
+    export type OrdersControllerMarkSeenMutationVariables = {id: string}
+
+    /**
+ * @summary Mark that someone at the cafe has looked at it
+ */
+export const useOrdersControllerMarkSeen = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerMarkSeen>>, TError,OrdersControllerMarkSeenMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof ordersControllerMarkSeen>>,
+        TError,
+        OrdersControllerMarkSeenMutationVariables,
+        TContext
+      > => {
+      return useMutation(getOrdersControllerMarkSeenMutationOptions(options), queryClient);
+    }
+    export const getOrdersControllerAssignCourierUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/orders/${id}/courier`
+}
+
+/**
+ * @summary Give a delivery to a courier, or take it back
+ */
+export const ordersControllerAssignCourier = async (id: string,
+    assignCourierDto: AssignCourierDto, options?: Parameters<typeof apiFetch>[1]): Promise<OrderDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<OrderDto>(getOrdersControllerAssignCourierUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(assignCourierDto)
+  }
+);}
+
+
+
+
+
+export const getOrdersControllerAssignCourierMutationKey = () => ['ordersControllerAssignCourier'] as const;
+
+export const getOrdersControllerAssignCourierMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerAssignCourier>>, TError,OrdersControllerAssignCourierMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ordersControllerAssignCourier>>, TError,OrdersControllerAssignCourierMutationVariables, TContext> => {
+
+const mutationKey = getOrdersControllerAssignCourierMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ordersControllerAssignCourier>>, OrdersControllerAssignCourierMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  ordersControllerAssignCourier(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrdersControllerAssignCourierMutationResult = NonNullable<Awaited<ReturnType<typeof ordersControllerAssignCourier>>>
+    export type OrdersControllerAssignCourierMutationBody = AssignCourierDto
+    export type OrdersControllerAssignCourierMutationError = unknown
+    export type OrdersControllerAssignCourierMutationVariables = {id: string;data: AssignCourierDto}
+
+    /**
+ * @summary Give a delivery to a courier, or take it back
+ */
+export const useOrdersControllerAssignCourier = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerAssignCourier>>, TError,OrdersControllerAssignCourierMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof ordersControllerAssignCourier>>,
+        TError,
+        OrdersControllerAssignCourierMutationVariables,
+        TContext
+      > => {
+      return useMutation(getOrdersControllerAssignCourierMutationOptions(options), queryClient);
     }
     export const getOrdersControllerMoveToTableUrl = (id: string,) => {
 
@@ -1012,3 +1175,97 @@ export const useOrdersControllerClose = <TError = unknown,
       > => {
       return useMutation(getOrdersControllerCloseMutationOptions(options), queryClient);
     }
+    export const getCouriersControllerListUrl = () => {
+
+
+
+
+  return `/api/v1/couriers`
+}
+
+export const couriersControllerList = async ( options?: Parameters<typeof apiFetch>[1]): Promise<CourierSummaryDto[]> => {
+
+  return apiFetch<CourierSummaryDto[]>(getCouriersControllerListUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getCouriersControllerListQueryKey = () => {
+    return [
+    `/api/v1/couriers`
+    ] as const;
+    }
+
+
+export const getCouriersControllerListQueryOptions = <TData = Awaited<ReturnType<typeof couriersControllerList>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof couriersControllerList>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCouriersControllerListQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof couriersControllerList>>> = ({ signal }) => couriersControllerList({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof couriersControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CouriersControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof couriersControllerList>>>
+export type CouriersControllerListQueryError = unknown
+
+
+export function useCouriersControllerList<TData = Awaited<ReturnType<typeof couriersControllerList>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof couriersControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof couriersControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof couriersControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCouriersControllerList<TData = Awaited<ReturnType<typeof couriersControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof couriersControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof couriersControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof couriersControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCouriersControllerList<TData = Awaited<ReturnType<typeof couriersControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof couriersControllerList>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useCouriersControllerList<TData = Awaited<ReturnType<typeof couriersControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof couriersControllerList>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCouriersControllerListQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+

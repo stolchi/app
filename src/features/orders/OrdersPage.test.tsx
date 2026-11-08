@@ -45,6 +45,7 @@ const order = (id: string, number: number, status: string, paidAmount = 0) => ({
     },
   ],
   payments: [],
+  seenAt: '2026-01-31T10:00:00Z',
 });
 
 const ACTIVE = [

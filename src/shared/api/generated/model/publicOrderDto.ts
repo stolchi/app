@@ -28,6 +28,11 @@ export interface PublicOrderDto {
      * @nullable
      */
   cancelReason: string | null;
+  /**
+     * When the courier on the way expects to arrive.
+     * @nullable
+     */
+  deliveryEta: string | null;
   createdAt: string;
   items: PublicOrderItemDto[];
 }
