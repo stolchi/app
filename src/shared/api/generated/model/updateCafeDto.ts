@@ -4,6 +4,8 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { DeliveryMode } from './deliveryMode';
+import type { LocationDto } from './locationDto';
 import type { OrderType } from './orderType';
 import type { ServiceMode } from './serviceMode';
 import type { WorkingHoursDto } from './workingHoursDto';
@@ -34,4 +36,8 @@ export interface UpdateCafeDto {
   packagingFee?: number;
   /** @minimum 0 */
   deliveryFee?: number;
+  /** Network couriers need the cafe on the map. */
+  deliveryMode?: DeliveryMode;
+  /** @nullable */
+  location?: LocationDto | null;
 }

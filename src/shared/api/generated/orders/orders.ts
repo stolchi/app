@@ -32,6 +32,7 @@ import type {
   CourierSummaryDto,
   CreateOrderDto,
   MoveOrderDto,
+  OfferDto,
   OrderDto,
   OrderPageDto,
   OrdersControllerListParams,
@@ -585,6 +586,167 @@ export const useOrdersControllerMarkSeen = <TError = unknown,
         TContext
       > => {
       return useMutation(getOrdersControllerMarkSeenMutationOptions(options), queryClient);
+    }
+    export const getOrdersControllerOfferUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/orders/${id}/offer`
+}
+
+/**
+ * @summary Put a delivery out to network couriers, or take it back
+ */
+export const ordersControllerOffer = async (id: string,
+    offerDto: OfferDto, options?: Parameters<typeof apiFetch>[1]): Promise<OrderDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<OrderDto>(getOrdersControllerOfferUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(offerDto)
+  }
+);}
+
+
+
+
+
+export const getOrdersControllerOfferMutationKey = () => ['ordersControllerOffer'] as const;
+
+export const getOrdersControllerOfferMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerOffer>>, TError,OrdersControllerOfferMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ordersControllerOffer>>, TError,OrdersControllerOfferMutationVariables, TContext> => {
+
+const mutationKey = getOrdersControllerOfferMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ordersControllerOffer>>, OrdersControllerOfferMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  ordersControllerOffer(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrdersControllerOfferMutationResult = NonNullable<Awaited<ReturnType<typeof ordersControllerOffer>>>
+    export type OrdersControllerOfferMutationBody = OfferDto
+    export type OrdersControllerOfferMutationError = unknown
+    export type OrdersControllerOfferMutationVariables = {id: string;data: OfferDto}
+
+    /**
+ * @summary Put a delivery out to network couriers, or take it back
+ */
+export const useOrdersControllerOffer = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerOffer>>, TError,OrdersControllerOfferMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof ordersControllerOffer>>,
+        TError,
+        OrdersControllerOfferMutationVariables,
+        TContext
+      > => {
+      return useMutation(getOrdersControllerOfferMutationOptions(options), queryClient);
+    }
+    export const getOrdersControllerHandOverUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/orders/${id}/hand-over`
+}
+
+/**
+ * @summary Handed to the network courier, settling up with them
+ */
+export const ordersControllerHandOver = async (id: string, options?: Parameters<typeof apiFetch>[1]): Promise<OrderDto> => {
+
+  return apiFetch<OrderDto>(getOrdersControllerHandOverUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getOrdersControllerHandOverMutationKey = () => ['ordersControllerHandOver'] as const;
+
+export const getOrdersControllerHandOverMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerHandOver>>, TError,OrdersControllerHandOverMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ordersControllerHandOver>>, TError,OrdersControllerHandOverMutationVariables, TContext> => {
+
+const mutationKey = getOrdersControllerHandOverMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ordersControllerHandOver>>, OrdersControllerHandOverMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  ordersControllerHandOver(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrdersControllerHandOverMutationResult = NonNullable<Awaited<ReturnType<typeof ordersControllerHandOver>>>
+
+    export type OrdersControllerHandOverMutationError = unknown
+    export type OrdersControllerHandOverMutationVariables = {id: string}
+
+    /**
+ * @summary Handed to the network courier, settling up with them
+ */
+export const useOrdersControllerHandOver = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerHandOver>>, TError,OrdersControllerHandOverMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof ordersControllerHandOver>>,
+        TError,
+        OrdersControllerHandOverMutationVariables,
+        TContext
+      > => {
+      return useMutation(getOrdersControllerHandOverMutationOptions(options), queryClient);
     }
     export const getOrdersControllerAssignCourierUrl = (id: string,) => {
 

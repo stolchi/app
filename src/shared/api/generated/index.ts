@@ -5,6 +5,7 @@ export * from './courier/courier';
 export * from './dashboard/dashboard';
 export * from './geo/geo';
 export * from './health/health';
+export * from './network/network';
 export * from './orders/orders';
 export * from './products/products';
 export * from './public/public';

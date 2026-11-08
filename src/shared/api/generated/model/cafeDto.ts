@@ -4,6 +4,8 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { DeliveryMode } from './deliveryMode';
+import type { LocationDto } from './locationDto';
 import type { OrderType } from './orderType';
 import type { ServiceMode } from './serviceMode';
 import type { TelegramBotStatusDto } from './telegramBotStatusDto';
@@ -35,6 +37,12 @@ export interface CafeDto {
   packagingFee: number;
   /** Whole so'm per delivery order. */
   deliveryFee: number;
+  deliveryMode: DeliveryMode;
+  /**
+     * Where couriers pick orders up.
+     * @nullable
+     */
+  location: LocationDto | null;
   /**
      * The token itself is never returned.
      * @nullable

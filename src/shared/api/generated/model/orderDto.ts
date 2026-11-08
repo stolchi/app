@@ -7,6 +7,7 @@
 import type { LocationDto } from './locationDto';
 import type { OrderCourierDto } from './orderCourierDto';
 import type { OrderItemDto } from './orderItemDto';
+import type { OrderNetworkCourierDto } from './orderNetworkCourierDto';
 import type { OrderSource } from './orderSource';
 import type { OrderStatus } from './orderStatus';
 import type { OrderType } from './orderType';
@@ -54,6 +55,13 @@ export interface OrderDto {
   deliveryEta: string | null;
   /** @nullable */
   courier: OrderCourierDto | null;
+  /**
+     * When it was put out to network couriers.
+     * @nullable
+     */
+  offeredAt: string | null;
+  /** @nullable */
+  networkCourier: OrderNetworkCourierDto | null;
   paidAmount: number;
   /** @nullable */
   note: string | null;

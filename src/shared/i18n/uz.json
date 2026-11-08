@@ -71,7 +71,8 @@
     "tables": "Stollar va QR",
     "staff": "Xodimlar",
     "settings": "Sozlamalar",
-    "delivery": "Yetkazib berish"
+    "delivery": "Yetkazib berish",
+    "courier": "Yetkazishlarim"
   },
   "layout": {
     "logout": "Chiqish",
@@ -463,7 +464,21 @@
       "amountInvalid": "Summani butun son bilan kiriting",
       "laterHint": "O'zgarish yangi buyurtmalarga qo'llanadi. Ochiq buyurtmalar eski narxlarida qoladi.",
       "deliveryFee": "Yetkazib berish narxi (so'm)",
-      "deliveryFeeHint": "Har bir yetkazib berish buyurtmasiga qo'shiladi. Qadoq narxi ham qo'shiladi."
+      "deliveryFeeHint": "Har bir yetkazib berish buyurtmasiga qo'shiladi. Qadoq narxi ham qo'shiladi.",
+      "deliveryMode": "Kim yetkazib beradi",
+      "mode": {
+        "OWN": "O'z kuryerlarimiz",
+        "NETWORK": "Stolchi kuryerlari",
+        "BOTH": "Ikkalasi ham"
+      },
+      "modeHint": {
+        "OWN": "Buyurtmalarni faqat kafe kuryerlari ko'radi.",
+        "NETWORK": "Har bir qabul qilingan yetkazish kuryer.stolchi.uz da yaqin atrofdagi kuryerlarga chiqadi.",
+        "BOTH": "O'z kuryerlaringiz oladi; kerak bo'lsa, buyurtmani \"Taksi topish\" bilan kuryer.stolchi.uz ga chiqarasiz."
+      },
+      "cafeLocation": "Kafe joylashuvi",
+      "cafeLocationHint": "Kuryerlar kafeni xaritadagi shu nuqta bo'yicha topadi.",
+      "cafeLocationRequired": "Stolchi kuryerlari uchun kafeni xaritada belgilang"
     }
   },
   "shortcuts": {
@@ -632,5 +647,81 @@
     "waitingFor": "{{name}} kelib olishi kutilmoqda",
     "onTheWay": "{{name}} yo'lda, taxminan {{time}} gacha",
     "onTheWayNoEta": "{{name}} yo'lda"
+  },
+  "courierPage": {
+    "title": "Yetkazishlarim",
+    "taken": "Bu buyurtmani boshqa kuryer oldi",
+    "tabs": {
+      "available": "Bo'sh",
+      "mine": "Meniki"
+    },
+    "available": {
+      "empty": "Hozir bo'sh yetkazish yo'q. Yangisi chiqsa, ovoz bilan bildiramiz.",
+      "take": "Men olaman",
+      "taken": "#{{number}} sizniki"
+    },
+    "mine": {
+      "empty": "Sizda yetkazish yo'q. \"Bo'sh\" bo'limidan oling.",
+      "groups": {
+        "waiting": "Tayyorlanmoqda",
+        "ready": "Tayyor: olib keting",
+        "onTheWay": "Yo'ldaman"
+      },
+      "release": "Voz kechish",
+      "released": "#{{number}} bo'shlarga qaytdi",
+      "pickUp": "Oldim, yo'lga chiqdim",
+      "deliver": "Yetkazdim",
+      "eta": "Taxminan {{time}} gacha"
+    },
+    "status": {
+      "ACCEPTED": "Qabul qilindi",
+      "COOKING": "Tayyorlanmoqda",
+      "READY": "Tayyor"
+    },
+    "pickUp": {
+      "title": "#{{number}}: qancha vaqtda yetkazasiz?",
+      "hint": "Mijozga shu vaqt aytiladi",
+      "minutes": "{{count}} daqiqa",
+      "done": "#{{number}}: yo'lga chiqdingiz"
+    },
+    "deliver": {
+      "title": "#{{number}}: mijozdan qanday oldingiz?",
+      "collect": "Mijozdan olish kerak: {{amount}}",
+      "paid": "Buyurtma to'langan. Yetkazilganini tasdiqlaysizmi?",
+      "cash": "Naqd",
+      "card": "Karta",
+      "confirm": "Tasdiqlash",
+      "done": "#{{number}} yetkazildi"
+    },
+    "card": {
+      "collect": "Olish kerak",
+      "paid": "To'langan",
+      "call": "Qo'ng'iroq",
+      "navigator": "Navigator",
+      "yandex": "Yandex Xarita",
+      "google": "Google",
+      "noPoint": "Xaritada nuqta yo'q: manzil bo'yicha boring yoki mijozga qo'ng'iroq qiling"
+    }
+  },
+  "network": {
+    "offer": "Taksi topish (kuryer.stolchi.uz)",
+    "withdraw": "Taksi qidirishni to'xtatish",
+    "searching": "Stolchi kuryeri qidirilmoqda...",
+    "taken": "Stolchi kuryeri: {{name}}",
+    "vehicle": {
+      "FOOT": "Piyoda",
+      "BICYCLE": "Velosiped",
+      "MOTORBIKE": "Mototsikl",
+      "CAR": "Mashina"
+    },
+    "handOver": "Kuryerga berildi",
+    "handOverTitle": "#{{number}}: kuryerga topshirasizmi?",
+    "collect": "Kuryer: {{name}}. U mijozdan {{amount}} oladi.",
+    "courierPays": "Kuryer kafega {{amount}} to'laydi",
+    "cafePays": "Kafe kuryerga {{amount}} beradi (yetkazish haqi)",
+    "even": "Kafe va kuryer o'rtasida pul o'tkazilmaydi",
+    "confirmHandOver": "Berildi",
+    "handedOver": "#{{number}} kuryerga berildi",
+    "arrives": "{{time}} da yetkazadi"
   }
 }

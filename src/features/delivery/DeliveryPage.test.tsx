@@ -55,10 +55,15 @@ const delivery = (id: string, number: number, status: string) => ({
   ],
   payments: [],
   seenAt: '2026-01-31T10:00:00Z',
+  courier: null,
+  deliveryEta: null,
+  offeredAt: null as string | null,
+  networkCourier: null as object | null,
 });
 
 function show({
   orderTypes = ['DINE_IN', 'TAKEAWAY', 'DELIVERY'],
+  deliveryMode = 'OWN',
   orders = [delivery('a', 1, 'NEW'), delivery('b', 2, 'READY')] as object[],
 } = {}) {
   const sent: { path: string; body: unknown }[] = [];
@@ -78,7 +83,8 @@ function show({
         });
         return json(orders[0]);
       }
-      if (url.pathname.endsWith('/cafes/current')) return json({ orderTypes });
+      if (url.pathname.endsWith('/cafes/current'))
+        return json({ orderTypes, deliveryMode });
       if (url.pathname.endsWith('/tables')) return json([]);
       if (url.pathname.endsWith('/couriers')) {
         return json([{ id: 'c1', name: 'Ali', activeDeliveries: 2 }]);
@@ -242,5 +248,75 @@ describe('DeliveryPage', () => {
     expect(
       await screen.findByRole('link', { name: uz.nav.settings }),
     ).toHaveAttribute('href', '/settings');
+  });
+
+  describe('Stolchi couriers', () => {
+    const taxi = {
+      id: 'n1',
+      name: 'Sardor',
+      phone: '+998935554433',
+      vehicle: 'CAR',
+    };
+
+    it('lets a cafe with both kinds look for a taxi, and stop looking', async () => {
+      const sent = show({
+        deliveryMode: 'BOTH',
+        orders: [delivery('b', 2, 'COOKING')],
+      });
+      await userEvent.click(
+        await screen.findByRole('button', { name: uz.network.offer }),
+      );
+      await waitFor(() =>
+        expect(sent).toEqual([
+          { path: '/api/v1/orders/b/offer', body: { offered: true } },
+        ]),
+      );
+    });
+
+    it('shows the search, without a taxi button, when the cafe only uses Stolchi', async () => {
+      show({
+        deliveryMode: 'NETWORK',
+        orders: [
+          { ...delivery('b', 2, 'COOKING'), offeredAt: '2026-01-31T10:00:00Z' },
+        ],
+      });
+      expect(await screen.findByText(uz.network.searching)).toBeVisible();
+      expect(
+        screen.queryByRole('button', { name: uz.network.offer }),
+      ).toBeNull();
+    });
+
+    it('hands ready food to the courier who took it, settling the money', async () => {
+      const sent = show({
+        deliveryMode: 'NETWORK',
+        orders: [{ ...delivery('b', 2, 'READY'), networkCourier: taxi }],
+      });
+      expect(
+        await screen.findByText(uz.network.taken.replace('{{name}}', 'Sardor')),
+      ).toBeVisible();
+      expect(screen.getByRole('link', { name: /935554433/ })).toHaveAttribute(
+        'href',
+        'tel:+998935554433',
+      );
+      // One button, and it goes through the hand-over, not a plain status change.
+      await userEvent.click(
+        screen.getByRole('button', { name: uz.network.handOver }),
+      );
+      const dialog = await screen.findByRole('dialog');
+      // 60 000 to collect, 15 000 is the courier's: they pay the cafe 45 000.
+      expect(
+        within(dialog).getByText(/Kuryer kafega 45[\s\u00a0]000/),
+      ).toBeVisible();
+      await userEvent.click(
+        within(dialog).getByRole('button', {
+          name: uz.network.confirmHandOver,
+        }),
+      );
+      await waitFor(() =>
+        expect(sent).toEqual([
+          { path: '/api/v1/orders/b/hand-over', body: {} },
+        ]),
+      );
+    });
   });
 });

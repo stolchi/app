@@ -4,13 +4,21 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useCafesControllerUpdate } from '@/shared/api/generated/cafes/cafes';
-import type { CafeDto, OrderType } from '@/shared/api/generated/model';
+import type {
+  CafeDto,
+  DeliveryMode,
+  OrderType,
+} from '@/shared/api/generated/model';
+import { LocationField } from '@/features/orders/LocationField';
+import type { Point } from '@/shared/lib/geo';
 import { formatAmountInput } from '@/shared/lib/format';
 import { ErrorText } from '@/shared/ui/ErrorText';
 import { FormField } from '@/shared/ui/FormField';
 import { SavedNote, useCafeMutationOptions } from './settings-parts';
 
 const ALL_TYPES: readonly OrderType[] = ['DINE_IN', 'TAKEAWAY', 'DELIVERY'];
+
+const DELIVERY_MODES: readonly DeliveryMode[] = ['OWN', 'NETWORK', 'BOTH'];
 
 const MAX_MONEY = 2_000_000_000;
 
@@ -30,6 +38,8 @@ export function OrderSettingsForm({ cafe }: { cafe: CafeDto }) {
   const [deliveryFee, setDeliveryFee] = useState(
     formatAmountInput(cafe.deliveryFee),
   );
+  const [mode, setMode] = useState<DeliveryMode>(cafe.deliveryMode);
+  const [place, setPlace] = useState<Point | null>(cafe.location);
   const [checked, setChecked] = useState(false);
 
   const percentValue = parseWhole(percent);
@@ -49,6 +59,8 @@ export function OrderSettingsForm({ cafe }: { cafe: CafeDto }) {
       : undefined;
   const delivers = types.includes('DELIVERY');
   const noType = types.length === 0;
+  // Taxi drivers find the cafe by its point on the map.
+  const placeMissing = delivers && mode !== 'OWN' && !place;
 
   const toggle = (type: OrderType, on: boolean) =>
     setTypes((current) =>
@@ -67,12 +79,17 @@ export function OrderSettingsForm({ cafe }: { cafe: CafeDto }) {
         setChecked(true);
         if (noType || percentError || packagingError) return;
         if (delivers && deliveryError) return;
+        if (placeMissing) return;
         update.mutate({
           data: {
             orderTypes: types,
             serviceChargePercent: percentValue ?? 0,
             packagingFee: packagingValue ?? 0,
-            ...(delivers && { deliveryFee: deliveryValue ?? 0 }),
+            ...(delivers && {
+              deliveryFee: deliveryValue ?? 0,
+              deliveryMode: mode,
+              location: place,
+            }),
           },
         });
       }}
@@ -136,6 +153,57 @@ export function OrderSettingsForm({ cafe }: { cafe: CafeDto }) {
           />
         )}
       </div>
+      {delivers && (
+        <>
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-medium">
+              {t('settings.orders.deliveryMode')}
+            </legend>
+            <div
+              role="radiogroup"
+              aria-label={t('settings.orders.deliveryMode')}
+              className="grid gap-2 sm:grid-cols-3"
+            >
+              {DELIVERY_MODES.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  role="radio"
+                  aria-checked={mode === option}
+                  onClick={() => setMode(option)}
+                  className="rounded-xl border border-border p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring aria-checked:border-primary aria-checked:bg-primary/5"
+                >
+                  <span className="block font-semibold">
+                    {t(`settings.orders.mode.${option}`)}
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    {t(`settings.orders.modeHint.${option}`)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">
+              {t('settings.orders.cafeLocation')}
+            </p>
+            <LocationField value={place} onChange={setPlace} />
+            <p
+              className={
+                checked && placeMissing
+                  ? 'text-sm text-destructive'
+                  : 'text-xs text-muted-foreground'
+              }
+            >
+              {t(
+                checked && placeMissing
+                  ? 'settings.orders.cafeLocationRequired'
+                  : 'settings.orders.cafeLocationHint',
+              )}
+            </p>
+          </div>
+        </>
+      )}
       <p className="text-xs text-muted-foreground">
         {t('settings.orders.laterHint')}
       </p>

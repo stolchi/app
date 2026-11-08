@@ -68,7 +68,10 @@ describe('permission-based menu', () => {
     ).toEqual(['/orders', '/delivery']);
   });
 
-  it('has no page for a courier: they use the courier site', () => {
-    expect(navItemsFor([Permission.DELIVERY_COURIER])).toEqual([]);
+  it("gives the cafe's own courier their page, which managers do not need", () => {
+    expect(
+      navItemsFor([Permission.DELIVERY_COURIER]).map((item) => item.path),
+    ).toEqual(['/courier']);
+    expect(paths(Object.values(Permission))).not.toContain('/courier');
   });
 });

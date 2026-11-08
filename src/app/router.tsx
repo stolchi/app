@@ -56,6 +56,11 @@ const DeliveryPage = lazy(() =>
     default: m.DeliveryPage,
   })),
 );
+const CourierPage = lazy(() =>
+  import('@/features/courier/CourierPage').then((m) => ({
+    default: m.CourierPage,
+  })),
+);
 const SettingsPage = lazy(() =>
   import('@/features/settings/SettingsPage').then((m) => ({
     default: m.SettingsPage,
@@ -151,6 +156,7 @@ export const router = createBrowserRouter([
           page('/kitchen', <KitchenPage />),
           page('/orders', <OrdersPage />),
           page('/delivery', <DeliveryPage />),
+          page('/courier', <CourierPage />),
           page('/menu', <MenuPage />),
           page('/tables', <TablesPage />),
           page('/staff', <StaffPage />),

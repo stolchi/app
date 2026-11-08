@@ -1,4 +1,5 @@
 import {
+  Bike,
   ChefHat,
   ClipboardList,
   ClipboardPen,
@@ -81,6 +82,15 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: Truck,
     allowed: holds(Permission.ORDERS_VIEW),
     feature: 'delivery',
+  },
+  {
+    // The cafe's own courier. Managers hold every permission but do not deliver.
+    path: '/courier',
+    label: 'nav.courier',
+    icon: Bike,
+    allowed: (permissions) =>
+      holds(Permission.DELIVERY_COURIER)(permissions) &&
+      !holds(Permission.STAFF_MANAGE)(permissions),
   },
   {
     path: '/menu',

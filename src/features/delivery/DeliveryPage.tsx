@@ -45,6 +45,8 @@ import { Page } from '@/shared/ui/Page';
 import { QueryState } from '@/shared/ui/QueryState';
 import { SoundHint } from '@/shared/ui/SoundHint';
 import { CourierPicker } from './CourierPicker';
+import { HandOverButton, NetworkState, OfferButton } from './NetworkCourier';
+import { useCafesControllerCurrent } from '@/shared/api/generated/cafes/cafes';
 import {
   groupDeliveries,
   overdue,
@@ -127,7 +129,10 @@ function DeliveryCard({
   });
   const waiting = group === 'waiting';
   const markSeen = useMarkSeen();
-  const next = NEXT[group];
+  const mode = useCafesControllerCurrent().data?.deliveryMode;
+  const network = order.networkCourier !== null;
+  // A Stolchi courier's order leaves through the hand-over, which settles the money.
+  const next = network && group === 'ready' ? undefined : NEXT[group];
   const time = elapsed(minutes);
 
   return (
@@ -164,11 +169,21 @@ function DeliveryCard({
         </span>
       </header>
       <CustomerDetails order={order} />
-      {!waiting && <CourierState order={order} group={group} />}
-      {/* Given to a courier once it is agreed, until they leave with it. */}
-      {(group === 'cooking' || group === 'ready') && mayEdit(permissions) && (
-        <CourierPicker order={order} />
+      {!waiting && (network || order.offeredAt) && (
+        <NetworkState order={order} />
       )}
+      {!waiting && !network && !order.offeredAt && (
+        <CourierState order={order} group={group} />
+      )}
+      {/* Given to a courier once it is agreed, until they leave with it. */}
+      {(group === 'cooking' || group === 'ready') &&
+        mayEdit(permissions) &&
+        !network && (
+          <>
+            {!order.offeredAt && <CourierPicker order={order} />}
+            <OfferButton order={order} mode={mode} />
+          </>
+        )}
       {waiting && (
         <ul className="space-y-0.5 text-sm">
           {order.items.map((item) => (
@@ -232,7 +247,13 @@ function DeliveryCard({
             {t(`delivery.next.${next}`)}
           </Button>
         )}
-        {group === 'onTheWay' && (
+        {network &&
+          group === 'ready' &&
+          maySetStatus(permissions, 'SERVED') && (
+            <HandOverButton order={order} />
+          )}
+        {/* A Stolchi courier closes the order themselves on arrival. */}
+        {group === 'onTheWay' && !network && (
           <Button className="h-12 text-base" onClick={onOpen}>
             <Check />
             {t('delivery.delivered')}

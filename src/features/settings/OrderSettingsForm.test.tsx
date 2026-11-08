@@ -15,6 +15,8 @@ const CAFE = {
   serviceChargePercent: 0,
   packagingFee: 0,
   deliveryFee: 0,
+  deliveryMode: 'OWN',
+  location: null,
 } as unknown as CafeDto;
 
 function stubPatch() {
@@ -70,6 +72,8 @@ describe('OrderSettingsForm', () => {
       serviceChargePercent: 10,
       packagingFee: 2000,
       deliveryFee: 15000,
+      deliveryMode: 'OWN',
+      location: null,
     });
   });
 
@@ -91,5 +95,40 @@ describe('OrderSettingsForm', () => {
     expect(screen.getByText(uz.settings.orders.typeRequired)).toBeVisible();
     expect(screen.getByText(uz.settings.orders.percentInvalid)).toBeVisible();
     expect(bodies).toHaveLength(0);
+  });
+
+  it('hands deliveries to Stolchi couriers only once the cafe is on the map', async () => {
+    const bodies = stubPatch();
+    renderForm();
+    await userEvent.click(
+      screen.getByRole('radio', {
+        name: new RegExp(uz.settings.orders.mode.NETWORK),
+      }),
+    );
+    await userEvent.click(screen.getByRole('button', { name: uz.common.save }));
+    expect(
+      screen.getByText(uz.settings.orders.cafeLocationRequired),
+    ).toBeVisible();
+    expect(bodies).toHaveLength(0);
+
+    cleanup();
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <OrderSettingsForm
+          cafe={{ ...CAFE, location: { latitude: 41.3, longitude: 69.24 } }}
+        />
+      </QueryClientProvider>,
+    );
+    await userEvent.click(
+      screen.getByRole('radio', {
+        name: new RegExp(uz.settings.orders.mode.BOTH),
+      }),
+    );
+    await userEvent.click(screen.getByRole('button', { name: uz.common.save }));
+    await waitFor(() => expect(bodies).toHaveLength(1));
+    expect(bodies[0]).toMatchObject({
+      deliveryMode: 'BOTH',
+      location: { latitude: 41.3, longitude: 69.24 },
+    });
   });
 });
