@@ -20,7 +20,7 @@ import {
   useProductsControllerSetAvailability,
 } from '@/shared/api/generated/products/products';
 import { ApiPath, invalidate } from '@/shared/api/invalidate';
-import { formatMoney } from '@/shared/lib/format';
+import { productPrice } from '@/shared/lib/product-price';
 import { useHeldValue } from '@/shared/lib/use-held-value';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -268,7 +268,7 @@ export function MenuPage() {
                   <div className="min-w-0 flex-1 px-2">
                     <p className="truncate font-medium">{product.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {formatMoney(product.price)}
+                      {productPrice(product)}
                     </p>
                   </div>
                   <label className="flex shrink-0 flex-col items-center gap-1 px-1 text-xs text-muted-foreground">

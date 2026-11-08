@@ -23,11 +23,21 @@ const product = (id: string, name: string, price: number, extra = {}) => ({
   imageUrl: null,
   isAvailable: true,
   sortOrder: 0,
+  unit: 'PIECE',
+  variants: [],
+  sendsToKitchen: true,
   ...extra,
 });
 const OSH = product('p1', 'Osh', 45000);
 const SOMSA = product('p2', 'Somsa', 8000);
 const NOT_LEFT = product('p3', 'Lagmon', 30000, { isAvailable: false });
+const PITSA = product('p4', 'Pitsa', 60000, {
+  variants: [
+    { id: 'v1', name: 'Katta', price: 90000 },
+    { id: 'v2', name: "O'rta", price: 60000 },
+  ],
+});
+const BALIQ = product('p5', 'Baliq', 120000, { unit: 'KG' });
 const TABLES = [
   { id: 't10', name: 'Stol 10', zone: null, qrToken: 'a', menuUrl: 'x' },
   { id: 't2', name: 'Stol 2', zone: null, qrToken: 'b', menuUrl: 'y' },
@@ -57,7 +67,9 @@ function stubApi(onCreate: (body: unknown) => Response, cafe: object = CAFE) {
         return Promise.resolve(onCreate(body));
       }
       if (path === '/api/v1/categories') return json([CATEGORY]);
-      if (path === '/api/v1/products') return json([OSH, SOMSA, NOT_LEFT]);
+      if (path === '/api/v1/products') {
+        return json([OSH, SOMSA, NOT_LEFT, PITSA, BALIQ]);
+      }
       if (path === '/api/v1/tables') return json(TABLES);
       if (path === '/api/v1/cafes/current') return json(cafe);
       if (path === '/api/v1/orders') {
@@ -250,6 +262,44 @@ describe('PosPage', () => {
     await userEvent.click(screen.getByRole('button', { name: uz.pos.send }));
     await waitFor(() => expect(posts).toHaveLength(1));
     expect(posts[0]).toMatchObject({ type: 'TAKEAWAY' });
+  });
+
+  it('asks for a size and for a weight', async () => {
+    const posts = stubApi(created);
+    renderPage();
+    await userEvent.click(await tile(/^Pitsa/));
+    const sizes = await screen.findByRole('dialog');
+    await userEvent.click(within(sizes).getByRole('button', { name: /Katta/ }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+    await userEvent.click(await tile(/^Baliq/));
+    const scales = await screen.findByRole('dialog');
+    await userEvent.type(
+      within(scales).getByLabelText(uz.weight.kilos),
+      '1,25',
+    );
+    await userEvent.click(
+      within(scales).getByRole('button', { name: uz.weight.confirm }),
+    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+    expect(screen.getByText('Pitsa (Katta)')).toBeVisible();
+    expect(screen.getByText("150 000 so'm")).toBeVisible();
+    await waitFor(() =>
+      expect(screen.getAllByText("240 000 so'm")[0]).toBeVisible(),
+    );
+
+    await userEvent.click(
+      screen.getByRole('button', { name: uz.orders.type.TAKEAWAY }),
+    );
+    await userEvent.click(screen.getByRole('button', { name: uz.pos.send }));
+    await waitFor(() => expect(posts).toHaveLength(1));
+    expect(posts[0]).toMatchObject({
+      items: [
+        { productId: 'p4', variantId: 'v1', quantity: 1 },
+        { productId: 'p5', quantity: 1250 },
+      ],
+    });
   });
 
   it('cannot add a sold-out product', async () => {

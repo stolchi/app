@@ -6,6 +6,7 @@ import {
   ChefHat,
   Minus,
   Plus,
+  Scale,
   Search,
   ShoppingBag,
   ShoppingCart,
@@ -20,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { OrderDialog } from '@/features/orders/OrderDialog';
 import { OrderAmounts } from '@/features/orders/OrderAmounts';
+import { WeightDialog } from '@/features/orders/WeightDialog';
 import { mayTakePayment } from '@/features/orders/order-rules';
 import { SourceBadge } from '@/features/orders/SourceBadge';
 import { StatusBadge } from '@/features/orders/StatusBadge';
@@ -37,6 +39,8 @@ import { usePermissions, useSessionStore } from '@/shared/auth/session-store';
 import { playChime } from '@/shared/lib/chime';
 import { useShortcuts } from '@/shared/lib/use-shortcuts';
 import { formatMoney, formatTime } from '@/shared/lib/format';
+import { productPrice } from '@/shared/lib/product-price';
+import { formatWeight, itemCount } from '@/shared/lib/quantity';
 import { AnimatedNumber } from '@/shared/motion/AnimatedNumber';
 import { SPRING } from '@/shared/motion/variants';
 import { useSocketEvent } from '@/shared/realtime/RealtimeProvider';
@@ -51,29 +55,36 @@ import { activeDraft, useActiveCart, useCartStore } from './cart-store';
 import { DraftTabs } from './DraftTabs';
 import { flyToCart } from './fly-to-cart';
 import { useCartAmounts } from './use-cart-amounts';
+import { VariantPicker } from './VariantPicker';
 
 const ACTIVE_ORDERS = { active: true, limit: 100 } as const;
 
-function flyPictureOf(tile: Element | null | undefined) {
-  const picture = tile?.querySelector<HTMLElement>('[data-fly-thumb]');
-  if (picture) flyToCart(picture);
+/** How much of a product the cart holds: pieces, or the weight. */
+function useInCart(product: ProductDto): string | undefined {
+  const lines = useCartStore((state) => activeDraft(state).lines);
+  const own = lines.filter((line) => line.productId === product.id);
+  if (own.length === 0) return undefined;
+  return product.unit === 'KG'
+    ? formatWeight(own[0].quantity)
+    : String(itemCount(own));
 }
 
-function ProductTile({ product }: { product: ProductDto }) {
+function ProductTile({
+  product,
+  onPick,
+}: {
+  product: ProductDto;
+  /** Sizes and weights need asking; anything else goes straight in. */
+  onPick: (product: ProductDto, picture: HTMLElement | null) => void;
+}) {
   const { t } = useTranslation();
-  const add = useCartStore((state) => state.add);
-  const inCart = useCartStore(
-    (state) =>
-      activeDraft(state).lines.find((line) => line.productId === product.id)
-        ?.quantity,
-  );
+  const inCart = useInCart(product);
 
   const onClick = (event: MouseEvent<HTMLButtonElement>) => {
-    add(product.id);
-    navigator.vibrate?.(8);
-    const picture =
-      event.currentTarget.querySelector<HTMLElement>('[data-fly-thumb]');
-    if (picture) flyToCart(picture);
+    onPick(
+      product,
+      event.currentTarget.querySelector<HTMLElement>('[data-fly-thumb]'),
+    );
   };
 
   return (
@@ -89,7 +100,7 @@ function ProductTile({ product }: { product: ProductDto }) {
       disabled={!product.isAvailable}
       data-product-id={product.id}
       aria-label={`${product.name}, ${
-        product.isAvailable ? formatMoney(product.price) : t('menu.soldOut')
+        product.isAvailable ? productPrice(product) : t('menu.soldOut')
       }`}
       onClick={onClick}
       className="group relative flex flex-col overflow-hidden rounded-2xl border bg-card text-left shadow-xs outline-none hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed"
@@ -117,7 +128,7 @@ function ProductTile({ product }: { product: ProductDto }) {
       <span className="flex flex-1 flex-col justify-between gap-1 p-3">
         <span className="leading-tight font-semibold">{product.name}</span>
         <span className="text-sm font-medium text-muted-foreground">
-          {formatMoney(product.price)}
+          {productPrice(product)}
         </span>
       </span>
       <AnimatePresence>
@@ -128,7 +139,7 @@ function ProductTile({ product }: { product: ProductDto }) {
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
             transition={{ type: 'spring', stiffness: 600, damping: 16 }}
-            className="absolute top-2 right-2 flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-md"
+            className="absolute top-2 right-2 flex h-8 min-w-8 items-center justify-center rounded-full bg-primary px-2 text-sm font-bold text-primary-foreground shadow-md"
           >
             {inCart}
           </motion.span>
@@ -153,12 +164,14 @@ function Cart({
   const createOrder = useOrdersControllerCreate();
   const [pickingTable, setPickingTable] = useState(false);
 
-  // A product deleted from the menu meanwhile simply drops out of the cart.
-  const lines = cart.lines.flatMap((line) => {
-    const product = products.find(({ id }) => id === line.productId);
-    return product ? [{ ...line, product }] : [];
-  });
-  const { offered, type, amounts } = useCartAmounts(cart, products);
+  const [weighing, setWeighing] = useState<{
+    key: string;
+    name: string;
+    pricePerKg: number;
+    grams: number;
+  } | null>(null);
+  // A product, or a size, deleted from the menu meanwhile simply drops out.
+  const { lines, offered, type, amounts } = useCartAmounts(cart, products);
   const soldOut = lines.filter(({ product }) => !product.isAvailable);
   const table = tables.find(({ id }) => id === cart.tableId);
   const tableSelected = type === 'TAKEAWAY' || table !== undefined;
@@ -178,8 +191,9 @@ function Cart({
         data: {
           type,
           ...(type === 'DINE_IN' && { tableId: cart.tableId }),
-          items: lines.map(({ productId, quantity, note }) => ({
+          items: lines.map(({ productId, variantId, quantity, note }) => ({
             productId,
+            ...(variantId && { variantId }),
             quantity,
             ...(note.trim() && { note: note.trim() }),
           })),
@@ -258,75 +272,106 @@ function Cart({
               <EmptyState icon={ShoppingCart}>{t('pos.emptyCart')}</EmptyState>
             </motion.li>
           )}
-          {lines.map(({ productId, quantity, note, product }) => (
-            <motion.li
-              key={productId}
-              layout
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 60 }}
-              transition={SPRING}
-              className="space-y-2 border-b p-3"
-            >
-              <div className="flex items-center gap-3">
-                <FoodThumb
-                  name={product.name}
-                  imageUrl={product.imageUrl}
-                  className="size-11 shrink-0 rounded-xl text-lg"
-                />
-                <span className="min-w-0 flex-1 truncate font-semibold">
-                  {product.name}
-                </span>
-                <span className="text-sm font-medium whitespace-nowrap">
-                  {formatMoney(product.price * quantity)}
-                </span>
-              </div>
-              {!product.isAvailable && (
-                <p className="text-sm text-destructive">{t('menu.soldOut')}</p>
-              )}
-              <div className="flex items-center gap-2">
-                <div className="flex items-center rounded-xl bg-muted">
-                  <Button
-                    variant="ghost"
-                    className="size-11"
-                    aria-label={t('pos.decrease', { name: product.name })}
-                    onClick={() => cart.setQuantity(productId, quantity - 1)}
-                  >
-                    <Minus />
-                  </Button>
-                  <span className="w-7 overflow-hidden text-center font-bold">
-                    <motion.span
-                      key={quantity}
-                      className="block"
-                      initial={{ y: -12, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={SPRING}
-                    >
-                      {quantity}
-                    </motion.span>
+          {lines.map(
+            ({ key, name, quantity, note, product, unit, price, total }) => (
+              <motion.li
+                key={key}
+                layout
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 60 }}
+                transition={SPRING}
+                className="space-y-2 border-b p-3"
+              >
+                <div className="flex items-center gap-3">
+                  <FoodThumb
+                    name={product.name}
+                    imageUrl={product.imageUrl}
+                    className="size-11 shrink-0 rounded-xl text-lg"
+                  />
+                  <span className="min-w-0 flex-1 truncate font-semibold">
+                    {name}
                   </span>
-                  <Button
-                    variant="ghost"
-                    className="size-11"
-                    aria-label={t('pos.increase', { name: product.name })}
-                    onClick={() => cart.setQuantity(productId, quantity + 1)}
-                  >
-                    <Plus />
-                  </Button>
+                  <span className="text-sm font-medium whitespace-nowrap">
+                    {formatMoney(total)}
+                  </span>
                 </div>
-                <Input
-                  className="h-11 min-w-0 flex-1 rounded-xl"
-                  placeholder={t('pos.notePlaceholder')}
-                  aria-label={t('pos.noteFor', { name: product.name })}
-                  maxLength={500}
-                  value={note}
-                  onChange={(event) =>
-                    cart.setNote(productId, event.target.value)
-                  }
-                />
-              </div>
-            </motion.li>
-          ))}
+                {!product.isAvailable && (
+                  <p className="text-sm text-destructive">
+                    {t('menu.soldOut')}
+                  </p>
+                )}
+                <div className="flex items-center gap-2">
+                  {unit === 'KG' ? (
+                    <div className="flex items-center rounded-xl bg-muted">
+                      <Button
+                        variant="ghost"
+                        className="h-11 gap-2 px-3 font-bold"
+                        aria-label={t('weight.edit', { name })}
+                        onClick={() =>
+                          setWeighing({
+                            key,
+                            name,
+                            pricePerKg: price,
+                            grams: quantity,
+                          })
+                        }
+                      >
+                        <Scale />
+                        {formatWeight(quantity)}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="size-11"
+                        aria-label={t('pos.decrease', { name })}
+                        onClick={() => cart.setQuantity(key, 0)}
+                      >
+                        <X />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center rounded-xl bg-muted">
+                      <Button
+                        variant="ghost"
+                        className="size-11"
+                        aria-label={t('pos.decrease', { name })}
+                        onClick={() => cart.setQuantity(key, quantity - 1)}
+                      >
+                        <Minus />
+                      </Button>
+                      <span className="w-7 overflow-hidden text-center font-bold">
+                        <motion.span
+                          key={quantity}
+                          className="block"
+                          initial={{ y: -12, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={SPRING}
+                        >
+                          {quantity}
+                        </motion.span>
+                      </span>
+                      <Button
+                        variant="ghost"
+                        className="size-11"
+                        aria-label={t('pos.increase', { name })}
+                        onClick={() => cart.setQuantity(key, quantity + 1)}
+                      >
+                        <Plus />
+                      </Button>
+                    </div>
+                  )}
+                  <Input
+                    className="h-11 min-w-0 flex-1 rounded-xl"
+                    placeholder={t('pos.notePlaceholder')}
+                    aria-label={t('pos.noteFor', { name })}
+                    maxLength={500}
+                    value={note}
+                    onChange={(event) => cart.setNote(key, event.target.value)}
+                  />
+                </div>
+              </motion.li>
+            ),
+          )}
         </AnimatePresence>
       </ul>
 
@@ -347,6 +392,13 @@ function Cart({
           </p>
         )}
       </div>
+      <WeightDialog
+        target={weighing}
+        onClose={() => setWeighing(null)}
+        onDone={(grams) => {
+          if (weighing) cart.setQuantity(weighing.key, grams);
+        }}
+      />
       <TablePicker
         open={pickingTable}
         onOpenChange={setPickingTable}
@@ -535,7 +587,7 @@ export function PosPage({
   const products = useProductsControllerList();
   const activeOrders = useOrdersControllerList(ACTIVE_ORDERS);
   const cartCount = useCartStore((state) =>
-    activeDraft(state).lines.reduce((sum, line) => sum + line.quantity, 0),
+    itemCount(activeDraft(state).lines),
   );
   const draft = useCartStore(activeDraft);
   const cartTotal = useCartAmounts(draft, products.data ?? []).amounts.total;
@@ -546,6 +598,30 @@ export function PosPage({
   const [query, setQuery] = useState('');
   const searchField = useRef<HTMLInputElement>(null);
   const addToCart = useCartStore((state) => state.add);
+  const weigh = useCartStore((state) => state.weigh);
+  const [sizing, setSizing] = useState<ProductDto | null>(null);
+  const [weighing, setWeighing] = useState<ProductDto | null>(null);
+  const [flying, setFlying] = useState<HTMLElement | null>(null);
+
+  /** Into the cart, asking first for a size or a weight. */
+  const pick = (product: ProductDto, picture: HTMLElement | null) => {
+    if (product.variants.length > 0) {
+      setFlying(picture);
+      setSizing(product);
+    } else if (product.unit === 'KG') {
+      setFlying(picture);
+      setWeighing(product);
+    } else {
+      addToCart(product.id);
+      navigator.vibrate?.(8);
+      if (picture) flyToCart(picture);
+    }
+  };
+  const landed = () => {
+    navigator.vibrate?.(8);
+    if (flying?.isConnected) flyToCart(flying);
+    setFlying(null);
+  };
 
   useShortcuts({
     '/': () => {
@@ -691,9 +767,11 @@ export function PosPage({
                     (product) => product.isAvailable,
                   );
                   if (!first) return;
-                  addToCart(first.id);
-                  flyPictureOf(
-                    document.querySelector(`[data-product-id="${first.id}"]`),
+                  pick(
+                    first,
+                    document
+                      .querySelector(`[data-product-id="${first.id}"]`)
+                      ?.querySelector<HTMLElement>('[data-fly-thumb]') ?? null,
                   );
                   setQuery('');
                 }
@@ -727,7 +805,11 @@ export function PosPage({
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
               <AnimatePresence mode="popLayout" initial={false}>
                 {shownProducts.map((product) => (
-                  <ProductTile key={product.id} product={product} />
+                  <ProductTile
+                    key={product.id}
+                    product={product}
+                    onPick={pick}
+                  />
                 ))}
               </AnimatePresence>
             </div>
@@ -807,6 +889,28 @@ export function PosPage({
         onDismiss={dismissToast}
       />
       <OrderDialog orderId={openOrderId} onClose={() => setOpenOrderId(null)} />
+      <VariantPicker
+        product={sizing}
+        onClose={() => setSizing(null)}
+        onPick={(variantId) => {
+          if (sizing) addToCart(sizing.id, variantId);
+          landed();
+        }}
+      />
+      <WeightDialog
+        target={
+          weighing && {
+            name: weighing.name,
+            pricePerKg: weighing.price,
+            grams: null,
+          }
+        }
+        onClose={() => setWeighing(null)}
+        onDone={(grams) => {
+          if (weighing) weigh(weighing.id, grams);
+          landed();
+        }}
+      />
     </div>
   );
 }

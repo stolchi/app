@@ -19,6 +19,7 @@ import {
 import type { OrderDto, Permission } from '@/shared/api/generated/model';
 import { ApiPath, invalidate } from '@/shared/api/invalidate';
 import { usePermissions } from '@/shared/auth/session-store';
+import { lineTotal, quantityLabel } from '@/shared/lib/quantity';
 import { formatDateTime, formatMoney } from '@/shared/lib/format';
 import { useHeldValue } from '@/shared/lib/use-held-value';
 import { celebrate } from '@/shared/ui/Celebration';
@@ -68,12 +69,22 @@ function OrderActions({
   const moveTo = useOrdersControllerMoveToTable(mutation);
 
   const unpaid = order.total - order.paidAmount;
+  // A guessed weight is not a price yet.
+  const unweighed = order.items.some((item) => !item.weighed);
   const next = nextStatus(order.status);
   const busy = changeStatus.isPending || close.isPending;
 
   return (
     <div className="space-y-2">
       <ErrorText error={changeStatus.error ?? close.error ?? moveTo.error} />
+      {unweighed && mayTakePayment(permissions) && (
+        <p
+          role="status"
+          className="rounded-xl bg-amber-100 p-3 text-sm text-amber-900"
+        >
+          {t('weight.mustWeigh')}
+        </p>
+      )}
       <div className="grid gap-2 sm:grid-cols-2">
         {next && next !== 'PAID' && maySetStatus(permissions, next) && (
           <Button
@@ -88,7 +99,11 @@ function OrderActions({
           </Button>
         )}
         {mayTakePayment(permissions) && unpaid > 0 && (
-          <Button className="h-12 text-base" onClick={() => setPaying(true)}>
+          <Button
+            className="h-12 text-base"
+            disabled={unweighed}
+            onClick={() => setPaying(true)}
+          >
             {t('orders.takePayment')}
           </Button>
         )}
@@ -210,7 +225,12 @@ function OrderBody({ order }: { order: OrderDto }) {
             className="flex justify-between gap-3 p-2.5 text-sm"
           >
             <span>
-              {item.quantity} × {item.name}
+              {quantityLabel(item.unit, item.quantity)} {item.name}
+              {!item.weighed && (
+                <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                  {t('weight.notWeighed')}
+                </span>
+              )}
               {item.note && (
                 <span className="block text-xs text-muted-foreground">
                   {item.note}
@@ -218,7 +238,7 @@ function OrderBody({ order }: { order: OrderDto }) {
               )}
             </span>
             <span className="whitespace-nowrap">
-              {formatMoney(item.price * item.quantity)}
+              {formatMoney(lineTotal(item))}
             </span>
           </li>
         ))}

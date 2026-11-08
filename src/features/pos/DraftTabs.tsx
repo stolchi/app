@@ -2,6 +2,7 @@ import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { itemCount } from '@/shared/lib/quantity';
 import { cn } from '@/lib/utils';
 import { useTables } from '@/features/orders/use-tables';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
@@ -18,8 +19,7 @@ export function DraftTabs({ className }: { className?: string }) {
   const labelOf = (draft: CartDraft) =>
     tables.find(({ id }) => id === draft.tableId)?.name ??
     t('pos.draft', { number: draft.id });
-  const countOf = (draft: CartDraft) =>
-    draft.lines.reduce((sum, line) => sum + line.quantity, 0);
+  const countOf = (draft: CartDraft) => itemCount(draft.lines);
 
   return (
     <div className={cn('flex items-center gap-1.5', className)}>

@@ -7,9 +7,12 @@
 
 export interface CreateOrderItemDto {
   productId: string;
+  /** The chosen size. Required for a product with sizes. */
+  variantId?: string;
   /**
+     * Pieces (up to 999), or grams for a product sold by weight.
      * @minimum 1
-     * @maximum 999
+     * @maximum 100000
      */
   quantity: number;
   note?: string;

@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { Minus, Plus, Search } from 'lucide-react';
+import { Minus, Plus, Scale, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -13,9 +13,12 @@ import { Input } from '@/components/ui/input';
 import { useCategoriesControllerList } from '@/shared/api/generated/categories/categories';
 import { useOrdersControllerUpdateItems } from '@/shared/api/generated/orders/orders';
 import { useProductsControllerList } from '@/shared/api/generated/products/products';
-import type { OrderDto } from '@/shared/api/generated/model';
+import type { OrderDto, ProductDto } from '@/shared/api/generated/model';
 import { ApiPath, invalidate } from '@/shared/api/invalidate';
+import { VariantPicker } from '@/features/pos/VariantPicker';
 import { formatMoney } from '@/shared/lib/format';
+import { productPrice } from '@/shared/lib/product-price';
+import { formatWeight, lineTotal } from '@/shared/lib/quantity';
 import { amountsOf } from '@/shared/lib/order-charges';
 import { celebrate } from '@/shared/ui/Celebration';
 import { ErrorText } from '@/shared/ui/ErrorText';
@@ -23,19 +26,18 @@ import {
   addProduct,
   addsFood,
   linesOf,
+  needsWeighing,
   setQuantity,
+  setWeight,
   toPayload,
   totalOf,
   type EditLine,
 } from './edit-lines';
 import { OrderAmounts } from './OrderAmounts';
 import { isStarted } from './order-rules';
+import { WeightDialog } from './WeightDialog';
 
-function ProductPicker({
-  onPick,
-}: {
-  onPick: (product: { id: string; name: string; price: number }) => void;
-}) {
+function ProductPicker({ onPick }: { onPick: (product: ProductDto) => void }) {
   const { t } = useTranslation();
   const categories = useCategoriesControllerList();
   const products = useProductsControllerList();
@@ -80,7 +82,7 @@ function ProductPicker({
             >
               <span className="font-medium">{product.name}</span>
               <span className="flex items-center gap-2 whitespace-nowrap text-muted-foreground">
-                {formatMoney(product.price)}
+                {productPrice(product)}
                 <Plus className="size-4 text-primary" />
               </span>
             </button>
@@ -100,6 +102,16 @@ function EditForm({ order, onDone }: { order: OrderDto; onDone: () => void }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [lines, setLines] = useState<EditLine[]>(() => linesOf(order));
+  const [sizing, setSizing] = useState<ProductDto | null>(null);
+  /** A product being added by weight, or a line being weighed. */
+  const [weighing, setWeighing] = useState<
+    { product: ProductDto } | { line: EditLine } | null
+  >(null);
+  const pick = (product: ProductDto) => {
+    if (product.variants.length > 0) setSizing(product);
+    else if (product.unit === 'KG') setWeighing({ product });
+    else setLines(addProduct(lines, product));
+  };
   const save = useOrdersControllerUpdateItems({
     mutation: {
       // On failure too: a conflict means this screen is behind someone else's change.
@@ -114,37 +126,66 @@ function EditForm({ order, onDone }: { order: OrderDto; onDone: () => void }) {
         {lines.map((line) => (
           <li key={line.key} className="space-y-2 p-2.5">
             <div className="flex items-center justify-between gap-2 text-sm">
-              <span className="font-semibold">{line.name}</span>
+              <span className="font-semibold">
+                {line.name}
+                {!line.weighed && (
+                  <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                    {t('weight.notWeighed')}
+                  </span>
+                )}
+              </span>
               <span className="whitespace-nowrap">
-                {formatMoney(line.price * line.quantity)}
+                {formatMoney(lineTotal(line))}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center rounded-xl bg-muted">
-                <Button
-                  variant="ghost"
-                  className="size-11"
-                  aria-label={t('pos.decrease', { name: line.name })}
-                  onClick={() =>
-                    setLines(setQuantity(lines, line.key, line.quantity - 1))
-                  }
-                >
-                  <Minus />
-                </Button>
-                <span className="w-7 text-center font-bold">
-                  {line.quantity}
-                </span>
-                <Button
-                  variant="ghost"
-                  className="size-11"
-                  aria-label={t('pos.increase', { name: line.name })}
-                  onClick={() =>
-                    setLines(setQuantity(lines, line.key, line.quantity + 1))
-                  }
-                >
-                  <Plus />
-                </Button>
-              </div>
+              {line.unit === 'KG' ? (
+                <div className="flex items-center rounded-xl bg-muted">
+                  <Button
+                    variant="ghost"
+                    className="h-11 gap-2 px-3 font-bold"
+                    aria-label={t('weight.edit', { name: line.name })}
+                    onClick={() => setWeighing({ line })}
+                  >
+                    <Scale />
+                    {formatWeight(line.quantity)}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="size-11"
+                    aria-label={t('pos.decrease', { name: line.name })}
+                    onClick={() => setLines(setQuantity(lines, line.key, 0))}
+                  >
+                    <X />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center rounded-xl bg-muted">
+                  <Button
+                    variant="ghost"
+                    className="size-11"
+                    aria-label={t('pos.decrease', { name: line.name })}
+                    onClick={() =>
+                      setLines(setQuantity(lines, line.key, line.quantity - 1))
+                    }
+                  >
+                    <Minus />
+                  </Button>
+                  <span className="w-7 text-center font-bold">
+                    {line.quantity}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    className="size-11"
+                    aria-label={t('pos.increase', { name: line.name })}
+                    onClick={() =>
+                      setLines(setQuantity(lines, line.key, line.quantity + 1))
+                    }
+                  >
+                    <Plus />
+                  </Button>
+                </div>
+              )}
               <Input
                 className="h-11 min-w-0 flex-1 rounded-xl"
                 placeholder={t('pos.notePlaceholder')}
@@ -168,8 +209,38 @@ function EditForm({ order, onDone }: { order: OrderDto; onDone: () => void }) {
       {lines.length === 0 && (
         <p className="text-sm text-destructive">{t('orders.edit.empty')}</p>
       )}
-      <ProductPicker
-        onPick={(product) => setLines(addProduct(lines, product))}
+      <ProductPicker onPick={pick} />
+      <VariantPicker
+        product={sizing}
+        onClose={() => setSizing(null)}
+        onPick={(variantId) => {
+          if (sizing) setLines(addProduct(lines, sizing, { variantId }));
+        }}
+      />
+      <WeightDialog
+        target={
+          weighing &&
+          ('line' in weighing
+            ? {
+                name: weighing.line.name,
+                pricePerKg: weighing.line.price,
+                grams: weighing.line.quantity,
+              }
+            : {
+                name: weighing.product.name,
+                pricePerKg: weighing.product.price,
+                grams: null,
+              })
+        }
+        onClose={() => setWeighing(null)}
+        onDone={(grams) => {
+          if (!weighing) return;
+          setLines(
+            'line' in weighing
+              ? setWeight(lines, weighing.line.key, grams)
+              : addProduct(lines, weighing.product, { grams }),
+          );
+        }}
       />
       {/* The order keeps the rates it was placed with. */}
       <OrderAmounts amounts={amountsOf(totalOf(lines), order)} />
@@ -180,6 +251,9 @@ function EditForm({ order, onDone }: { order: OrderDto; onDone: () => void }) {
         >
           {t('orders.edit.backToKitchen')}
         </p>
+      )}
+      {needsWeighing(lines) && (
+        <p className="text-sm text-amber-900">{t('weight.mustWeigh')}</p>
       )}
       <ErrorText error={save.error} />
       <Button

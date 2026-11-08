@@ -4,11 +4,17 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { ProductUnit } from './productUnit';
 
 export interface PublicOrderItemDto {
   name: string;
+  /** Per kilogram for KG. */
   price: number;
+  unit: ProductUnit;
+  /** Pieces, or grams for KG. */
   quantity: number;
+  /** False until staff weigh it: the price may change. */
+  weighed: boolean;
   /** @nullable */
   note: string | null;
 }

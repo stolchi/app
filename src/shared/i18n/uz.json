@@ -115,14 +115,32 @@
       "price": "Narxi (so'm)",
       "category": "Kategoriya",
       "description": "Tavsif",
-      "image": "Rasm"
+      "image": "Rasm",
+      "unit": "Qanday sotiladi",
+      "pricePerKg": "1 kg narxi (so'm)",
+      "variants": "O'lchamlar yoki porsiyalar",
+      "sendsToKitchen": "Oshxonaga yuboriladi"
     },
     "errors": {
       "nameRequired": "Nomini kiriting",
       "categoryRequired": "Kategoriyani tanlang",
       "priceInvalid": "Narxni butun son bilan kiriting",
-      "categoryHasProducts": "Avval bu kategoriyadagi taomlarni o'chiring yoki boshqasiga o'tkazing"
-    }
+      "categoryHasProducts": "Avval bu kategoriyadagi taomlarni o'chiring yoki boshqasiga o'tkazing",
+      "variantName": "O'lcham nomini kiriting"
+    },
+    "unit": {
+      "PIECE": "Dona",
+      "KG": "Kilogramm"
+    },
+    "variantsHint": "Masalan, osh: 1 porsiya va 0,7 porsiya. Bo'lsa, buyurtmada bittasi tanlanadi.",
+    "variantName": "{{number}}-o'lcham nomi",
+    "variantPrice": "{{number}}-o'lcham narxi",
+    "variantNamePlaceholder": "Masalan, 0,7 porsiya",
+    "removeVariant": "{{number}}-o'lchamni olib tashlash",
+    "addVariant": "O'lcham qo'shish",
+    "sendsToKitchenHint": "Tayyor mahsulot (ichimlik, non) uchun o'chiring: oshxona ekraniga tushmaydi.",
+    "perKg": "kg",
+    "fromPrice": "{{price}} dan"
   },
   "tables": {
     "add": "Stol qo'shish",
@@ -305,7 +323,8 @@
     "newDraft": "Yangi mijoz",
     "removeDraft": "{{name}} savatini o'chirish",
     "removeDraftQuestion": "{{name}} savati o'chirilsinmi?",
-    "noOrderTypes": "Kafe sozlamalarida buyurtma turi yoqilmagan"
+    "noOrderTypes": "Kafe sozlamalarida buyurtma turi yoqilmagan",
+    "chooseSize": "{{name}}: o'lchamni tanlang"
   },
   "kitchen": {
     "minutes": "{{minutes}} daqiqa",
@@ -321,7 +340,8 @@
       "SERVED": "Mijozga berildi"
     },
     "dragHint": "Kartani bosib turib keyingi ustunga suring yoki tugmani bosing",
-    "added": "+{{count}} qo'shildi"
+    "added": "+{{count}} qo'shildi",
+    "addedWeight": "+{{weight}} qo'shildi"
   },
   "dashboard": {
     "title": "Bugungi ko'rsatkichlar",
@@ -489,5 +509,15 @@
     "TABLES_MANAGE": "Stollar va QR kodlarni boshqarish",
     "SETTINGS_MANAGE": "Kafe sozlamalarini o'zgartirish",
     "STAFF_MANAGE": "Xodimlar va rollarni boshqarish"
+  },
+  "weight": {
+    "title": "{{name}}: og'irligi",
+    "perKg": "{{name}}, 1 kg — {{price}}",
+    "kilos": "Og'irligi, kilogrammda",
+    "invalid": "Og'irlikni kilogrammda kiriting, masalan 1,25",
+    "confirm": "Tasdiqlash",
+    "edit": "{{name}} og'irligini o'zgartirish",
+    "notWeighed": "Tortilmagan",
+    "mustWeigh": "Tortilmagan taom bor: avval og'irligini kiriting"
   }
 }

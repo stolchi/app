@@ -4,6 +4,8 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { ProductUnit } from './productUnit';
+import type { ProductVariantDto } from './productVariantDto';
 
 export interface CreateProductDto {
   categoryId: string;
@@ -11,10 +13,15 @@ export interface CreateProductDto {
   /** @nullable */
   description?: string | null;
   /**
-     * Whole so'm.
+     * Whole so'm, per kilogram for a KG product. With variants it is set to the cheapest.
      * @minimum 0
      */
   price: number;
+  unit?: ProductUnit;
+  /** Sizes to choose from. Not for a KG product. */
+  variants?: ProductVariantDto[];
+  /** False for what is ready to hand over, such as bottled drinks. */
+  sendsToKitchen?: boolean;
   isAvailable?: boolean;
   /** @minimum 0 */
   sortOrder?: number;

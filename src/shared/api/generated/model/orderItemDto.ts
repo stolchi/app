@@ -4,6 +4,7 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { ProductUnit } from './productUnit';
 
 export interface OrderItemDto {
   id: string;
@@ -12,10 +13,18 @@ export interface OrderItemDto {
      * @nullable
      */
   productId: string | null;
+  /** @nullable */
+  variantId: string | null;
+  /** With the size, if one was chosen. */
   name: string;
-  /** Whole so'm, as it was when ordered. */
+  /** Whole so'm as it was when ordered, per kilogram for KG. */
   price: number;
+  unit: ProductUnit;
+  /** Pieces, or grams for KG. */
   quantity: number;
+  /** False while a customer's guess at the weight waits for the scales. */
+  weighed: boolean;
+  sendsToKitchen: boolean;
   /** @nullable */
   note: string | null;
   /** How much of the quantity was added after cooking began, until ready again. */

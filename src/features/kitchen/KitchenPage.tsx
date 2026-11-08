@@ -21,6 +21,7 @@ import { AnimatePresence, LayoutGroup, motion } from 'motion/react';
 import { useState, type ComponentProps, type Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { formatWeight, quantityLabel } from '@/shared/lib/quantity';
 import { cn } from '@/lib/utils';
 import { maySetStatus, stepsTo } from '@/features/orders/order-rules';
 import { SourceBadge } from '@/features/orders/SourceBadge';
@@ -155,21 +156,31 @@ function OrderCard({
       </div>
       <p className="font-semibold">{place}</p>
       <ul className="space-y-1 border-t pt-2">
-        {order.items.map((item) => (
-          <li key={item.id} className="text-base">
-            <span className="font-bold">{item.quantity} ×</span> {item.name}
-            {item.addedQuantity > 0 && (
-              <span className="ml-1.5 rounded-md bg-amber-200 px-1.5 py-0.5 text-sm font-bold text-amber-900">
-                {t('kitchen.added', { count: item.addedQuantity })}
-              </span>
-            )}
-            {item.note && (
-              <span className="mt-0.5 block w-fit rounded-md bg-primary/10 px-1.5 py-0.5 text-sm font-medium text-primary">
-                {item.note}
-              </span>
-            )}
-          </li>
-        ))}
+        {/* Drinks and bread are handed over at the counter: not the kitchen's. */}
+        {order.items
+          .filter((item) => item.sendsToKitchen)
+          .map((item) => (
+            <li key={item.id} className="text-base">
+              <span className="font-bold">
+                {quantityLabel(item.unit, item.quantity)}
+              </span>{' '}
+              {item.name}
+              {item.addedQuantity > 0 && (
+                <span className="ml-1.5 rounded-md bg-amber-200 px-1.5 py-0.5 text-sm font-bold text-amber-900">
+                  {item.unit === 'KG'
+                    ? t('kitchen.addedWeight', {
+                        weight: formatWeight(item.addedQuantity),
+                      })
+                    : t('kitchen.added', { count: item.addedQuantity })}
+                </span>
+              )}
+              {item.note && (
+                <span className="mt-0.5 block w-fit rounded-md bg-primary/10 px-1.5 py-0.5 text-sm font-medium text-primary">
+                  {item.note}
+                </span>
+              )}
+            </li>
+          ))}
       </ul>
       {order.note && (
         <p className="text-sm font-medium text-primary">{order.note}</p>
@@ -314,6 +325,8 @@ export function KitchenPage() {
 
   // Oldest first: they have been waiting the longest.
   const shown = orders.data.items
+    // An order of drinks alone has nothing for the kitchen to do.
+    .filter((order) => order.items.some((item) => item.sendsToKitchen))
     .map((order) => ({ ...order, status: moving[order.id] ?? order.status }))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   const dragged = shown.find(({ id }) => id === draggingId);

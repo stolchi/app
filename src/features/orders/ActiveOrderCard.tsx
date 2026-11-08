@@ -10,6 +10,7 @@ import {
 import type { OrderDto } from '@/shared/api/generated/model';
 import { ApiPath, invalidate } from '@/shared/api/invalidate';
 import { usePermissions } from '@/shared/auth/session-store';
+import { quantityLabel } from '@/shared/lib/quantity';
 import { formatMoney } from '@/shared/lib/format';
 import { celebrate } from '@/shared/ui/Celebration';
 import { ErrorText } from '@/shared/ui/ErrorText';
@@ -65,7 +66,11 @@ export function ActiveOrderCard({
   const busy = changeStatus.isPending || close.isPending;
   const mayAdvance =
     next !== null && next !== 'PAID' && maySetStatus(permissions, next);
-  const mayPay = mayTakePayment(permissions) && unpaid > 0;
+  // A guessed weight is not a price yet: weigh it first, in the order itself.
+  const mayPay =
+    mayTakePayment(permissions) &&
+    unpaid > 0 &&
+    order.items.every((item) => item.weighed);
   const mayClose =
     mayTakePayment(permissions) && order.status === 'SERVED' && unpaid === 0;
   const time = elapsed(minutes);
@@ -92,7 +97,10 @@ export function ActiveOrderCard({
         </span>
         <span className="block text-sm">
           {order.items
-            .map((item) => `${item.quantity} × ${item.name}`)
+            .map(
+              (item) =>
+                `${quantityLabel(item.unit, item.quantity)} ${item.name}`,
+            )
             .join(', ')}
         </span>
         <span className="flex items-baseline justify-between gap-3 pt-1">

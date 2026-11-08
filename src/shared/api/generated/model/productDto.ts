@@ -4,6 +4,8 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { ProductUnit } from './productUnit';
+import type { VariantDto } from './variantDto';
 
 export interface ProductDto {
   id: string;
@@ -11,8 +13,11 @@ export interface ProductDto {
   name: string;
   /** @nullable */
   description: string | null;
-  /** Whole so'm. */
+  /** Whole so'm, per kilogram for a KG product; the cheapest size when there are variants. */
   price: number;
+  unit: ProductUnit;
+  variants: VariantDto[];
+  sendsToKitchen: boolean;
   /** @nullable */
   imageUrl: string | null;
   isAvailable: boolean;

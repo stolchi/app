@@ -4,14 +4,19 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { ProductUnit } from './productUnit';
+import type { VariantDto } from './variantDto';
 
 export interface PublicProductDto {
   id: string;
   name: string;
   /** @nullable */
   description: string | null;
-  /** Whole so'm. */
+  /** Whole so'm, per kilogram for KG; the cheapest size when there are variants. */
   price: number;
+  unit: ProductUnit;
+  /** Empty, or one must be chosen. */
+  variants: VariantDto[];
   /** @nullable */
   imageUrl: string | null;
   /** Unavailable products are shown greyed out. */

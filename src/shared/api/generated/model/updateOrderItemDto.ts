@@ -10,9 +10,14 @@ export interface UpdateOrderItemDto {
   id?: string;
   /** Required for a new line. */
   productId?: string;
+  /** A new line's size, for a product with sizes. */
+  variantId?: string;
+  /** Confirms a customer's weight as it is. Changing a weight confirms it too. */
+  weighed?: boolean;
   /**
+     * Pieces (up to 999), or grams for a product sold by weight.
      * @minimum 1
-     * @maximum 999
+     * @maximum 100000
      */
   quantity: number;
   note?: string;

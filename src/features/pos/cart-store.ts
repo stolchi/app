@@ -1,13 +1,25 @@
 import { create } from 'zustand';
+import type { ProductUnit } from '@/shared/api/generated/model';
 import { useSessionStore } from '@/shared/auth/session-store';
+import { MAX_GRAMS } from '@/shared/lib/quantity';
 
 export const MAX_QUANTITY = 999;
 
 export interface CartLine {
+  /** The product, and its size when it has sizes: each size is its own line. */
+  key: string;
   productId: string;
+  variantId?: string;
+  unit: ProductUnit;
+  /** Pieces, or grams for KG. */
   quantity: number;
   note: string;
 }
+
+export const lineKey = (productId: string, variantId?: string) =>
+  variantId ? `${productId}:${variantId}` : productId;
+
+const maxOf = (unit: ProductUnit) => (unit === 'KG' ? MAX_GRAMS : MAX_QUANTITY);
 
 export type CartOrderType = 'DINE_IN' | 'TAKEAWAY';
 
@@ -24,9 +36,12 @@ interface CartState {
   /** Never empty: there is always a draft to add to. */
   drafts: CartDraft[];
   activeId: number;
-  add: (productId: string) => void;
-  setQuantity: (productId: string, quantity: number) => void;
-  setNote: (productId: string, note: string) => void;
+  /** One more piece of a product, or of one of its sizes. */
+  add: (productId: string, variantId?: string) => void;
+  /** Sets the weight of a weighed product, in grams. */
+  weigh: (productId: string, grams: number) => void;
+  setQuantity: (key: string, quantity: number) => void;
+  setNote: (key: string, note: string) => void;
   setType: (type: CartOrderType) => void;
   setTableId: (tableId: string) => void;
   /** Sets the current customer aside and starts on another. */
@@ -69,34 +84,61 @@ export const useCartStore = create<CartState>((set) => {
   return {
     drafts: [newDraft(1)],
     activeId: 1,
-    add: (productId) =>
-      patchActive(({ lines }) => ({
-        lines: lines.some((line) => line.productId === productId)
-          ? lines.map((line) =>
-              line.productId === productId
-                ? {
-                    ...line,
-                    quantity: Math.min(line.quantity + 1, MAX_QUANTITY),
-                  }
-                : line,
-            )
-          : [...lines, { productId, quantity: 1, note: '' }],
-      })),
-    setQuantity: (productId, quantity) =>
+    add: (productId, variantId) =>
+      patchActive(({ lines }) => {
+        const key = lineKey(productId, variantId);
+        return {
+          lines: lines.some((line) => line.key === key)
+            ? lines.map((line) =>
+                line.key === key
+                  ? {
+                      ...line,
+                      quantity: Math.min(line.quantity + 1, MAX_QUANTITY),
+                    }
+                  : line,
+              )
+            : [
+                ...lines,
+                {
+                  key,
+                  productId,
+                  ...(variantId && { variantId }),
+                  unit: 'PIECE',
+                  quantity: 1,
+                  note: '',
+                },
+              ],
+        };
+      }),
+    weigh: (productId, grams) =>
+      patchActive(({ lines }) => {
+        const quantity = Math.min(Math.max(grams, 1), MAX_GRAMS);
+        return {
+          lines: lines.some((line) => line.key === productId)
+            ? lines.map((line) =>
+                line.key === productId ? { ...line, quantity } : line,
+              )
+            : [
+                ...lines,
+                { key: productId, productId, unit: 'KG', quantity, note: '' },
+              ],
+        };
+      }),
+    setQuantity: (key, quantity) =>
       patchActive(({ lines }) => ({
         lines:
           quantity < 1
-            ? lines.filter((line) => line.productId !== productId)
+            ? lines.filter((line) => line.key !== key)
             : lines.map((line) =>
-                line.productId === productId
-                  ? { ...line, quantity: Math.min(quantity, MAX_QUANTITY) }
+                line.key === key
+                  ? { ...line, quantity: Math.min(quantity, maxOf(line.unit)) }
                   : line,
               ),
       })),
-    setNote: (productId, note) =>
+    setNote: (key, note) =>
       patchActive(({ lines }) => ({
         lines: lines.map((line) =>
-          line.productId === productId ? { ...line, note } : line,
+          line.key === key ? { ...line, note } : line,
         ),
       })),
     setType: (type) => patchActive(() => ({ type })),
