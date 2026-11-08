@@ -296,7 +296,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCafesControllerSetLogoMutationOptions(options), queryClient);
     }
-    export const getCafesControllerSetTelegramBotUrl = () => {
+    export const getTelegramSettingsControllerConnectUrl = () => {
 
 
 
@@ -304,7 +304,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return `/api/v1/cafes/current/telegram-bot`
 }
 
-export const cafesControllerSetTelegramBot = async (setTelegramBotDto: SetTelegramBotDto, options?: Parameters<typeof apiFetch>[1]): Promise<CafeDto> => {
+export const telegramSettingsControllerConnect = async (setTelegramBotDto: SetTelegramBotDto, options?: Parameters<typeof apiFetch>[1]): Promise<CafeDto> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -320,7 +320,7 @@ export const cafesControllerSetTelegramBot = async (setTelegramBotDto: SetTelegr
     }
     return headers;
   };
-return apiFetch<CafeDto>(getCafesControllerSetTelegramBotUrl(),
+return apiFetch<CafeDto>(getTelegramSettingsControllerConnectUrl(),
   {
     ...options,
     method: 'PUT',
@@ -333,13 +333,13 @@ return apiFetch<CafeDto>(getCafesControllerSetTelegramBotUrl(),
 
 
 
-export const getCafesControllerSetTelegramBotMutationKey = () => ['cafesControllerSetTelegramBot'] as const;
+export const getTelegramSettingsControllerConnectMutationKey = () => ['telegramSettingsControllerConnect'] as const;
 
-export const getCafesControllerSetTelegramBotMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cafesControllerSetTelegramBot>>, TError,CafesControllerSetTelegramBotMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof cafesControllerSetTelegramBot>>, TError,CafesControllerSetTelegramBotMutationVariables, TContext> => {
+export const getTelegramSettingsControllerConnectMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof telegramSettingsControllerConnect>>, TError,TelegramSettingsControllerConnectMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof telegramSettingsControllerConnect>>, TError,TelegramSettingsControllerConnectMutationVariables, TContext> => {
 
-const mutationKey = getCafesControllerSetTelegramBotMutationKey();
+const mutationKey = getTelegramSettingsControllerConnectMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -349,10 +349,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cafesControllerSetTelegramBot>>, CafesControllerSetTelegramBotMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof telegramSettingsControllerConnect>>, TelegramSettingsControllerConnectMutationVariables> = (props) => {
           const {data} = props ?? {};
 
-          return  cafesControllerSetTelegramBot(data,requestOptions)
+          return  telegramSettingsControllerConnect(data,requestOptions)
         }
 
 
@@ -362,18 +362,152 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type CafesControllerSetTelegramBotMutationResult = NonNullable<Awaited<ReturnType<typeof cafesControllerSetTelegramBot>>>
-    export type CafesControllerSetTelegramBotMutationBody = SetTelegramBotDto
-    export type CafesControllerSetTelegramBotMutationError = unknown
-    export type CafesControllerSetTelegramBotMutationVariables = {data: SetTelegramBotDto}
+    export type TelegramSettingsControllerConnectMutationResult = NonNullable<Awaited<ReturnType<typeof telegramSettingsControllerConnect>>>
+    export type TelegramSettingsControllerConnectMutationBody = SetTelegramBotDto
+    export type TelegramSettingsControllerConnectMutationError = unknown
+    export type TelegramSettingsControllerConnectMutationVariables = {data: SetTelegramBotDto}
 
-    export const useCafesControllerSetTelegramBot = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cafesControllerSetTelegramBot>>, TError,CafesControllerSetTelegramBotMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+    export const useTelegramSettingsControllerConnect = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof telegramSettingsControllerConnect>>, TError,TelegramSettingsControllerConnectMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof cafesControllerSetTelegramBot>>,
+        Awaited<ReturnType<typeof telegramSettingsControllerConnect>>,
         TError,
-        CafesControllerSetTelegramBotMutationVariables,
+        TelegramSettingsControllerConnectMutationVariables,
         TContext
       > => {
-      return useMutation(getCafesControllerSetTelegramBotMutationOptions(options), queryClient);
+      return useMutation(getTelegramSettingsControllerConnectMutationOptions(options), queryClient);
+    }
+    export const getTelegramSettingsControllerDisconnectUrl = () => {
+
+
+
+
+  return `/api/v1/cafes/current/telegram-bot`
+}
+
+export const telegramSettingsControllerDisconnect = async ( options?: Parameters<typeof apiFetch>[1]): Promise<CafeDto> => {
+
+  return apiFetch<CafeDto>(getTelegramSettingsControllerDisconnectUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getTelegramSettingsControllerDisconnectMutationKey = () => ['telegramSettingsControllerDisconnect'] as const;
+
+export const getTelegramSettingsControllerDisconnectMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof telegramSettingsControllerDisconnect>>, TError,void, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof telegramSettingsControllerDisconnect>>, TError,void, TContext> => {
+
+const mutationKey = getTelegramSettingsControllerDisconnectMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof telegramSettingsControllerDisconnect>>, void> = () => {
+
+
+          return  telegramSettingsControllerDisconnect(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TelegramSettingsControllerDisconnectMutationResult = NonNullable<Awaited<ReturnType<typeof telegramSettingsControllerDisconnect>>>
+
+    export type TelegramSettingsControllerDisconnectMutationError = unknown
+
+
+    export const useTelegramSettingsControllerDisconnect = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof telegramSettingsControllerDisconnect>>, TError,void, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof telegramSettingsControllerDisconnect>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getTelegramSettingsControllerDisconnectMutationOptions(options), queryClient);
+    }
+    export const getTelegramSettingsControllerSendTestUrl = () => {
+
+
+
+
+  return `/api/v1/cafes/current/telegram-bot/test`
+}
+
+export const telegramSettingsControllerSendTest = async ( options?: Parameters<typeof apiFetch>[1]): Promise<void> => {
+
+  return apiFetch<void>(getTelegramSettingsControllerSendTestUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getTelegramSettingsControllerSendTestMutationKey = () => ['telegramSettingsControllerSendTest'] as const;
+
+export const getTelegramSettingsControllerSendTestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof telegramSettingsControllerSendTest>>, TError,void, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof telegramSettingsControllerSendTest>>, TError,void, TContext> => {
+
+const mutationKey = getTelegramSettingsControllerSendTestMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof telegramSettingsControllerSendTest>>, void> = () => {
+
+
+          return  telegramSettingsControllerSendTest(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TelegramSettingsControllerSendTestMutationResult = NonNullable<Awaited<ReturnType<typeof telegramSettingsControllerSendTest>>>
+
+    export type TelegramSettingsControllerSendTestMutationError = unknown
+
+
+    export const useTelegramSettingsControllerSendTest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof telegramSettingsControllerSendTest>>, TError,void, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof telegramSettingsControllerSendTest>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getTelegramSettingsControllerSendTestMutationOptions(options), queryClient);
     }

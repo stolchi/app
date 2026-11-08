@@ -11,5 +11,18 @@ export interface TelegramBotStatusDto {
      * @nullable
      */
   username: string | null;
+  /** Telegram has the webhook: the bot answers. */
   isActive: boolean;
+  /**
+     * Why the bot is not working: Telegram's words, or NEEDS_HTTPS when the API has no public https address.
+     * @nullable
+     */
+  error: string | null;
+  /** A chat gets new orders and the daily summary. */
+  notificationsLinked: boolean;
+  /**
+     * Opening this in Telegram ties that chat (or group) to the cafe.
+     * @nullable
+     */
+  linkUrl: string | null;
 }

@@ -414,9 +414,27 @@
     "telegram": {
       "token": "Bot tokeni",
       "hint": "@BotFather bergan token. U shifrlab saqlanadi va boshqa ko'rsatilmaydi.",
-      "saved": "Token saqlangan. Bot keyingi yangilanishda ishga tushadi.",
       "replace": "Tokenni almashtirish",
-      "invalid": "Bu Telegram bot tokeniga o'xshamaydi"
+      "invalid": "Bu Telegram bot tokeniga o'xshamaydi",
+      "connect": "Botni ulash",
+      "step1": "Telegram'da @BotFather ni oching va /newbot buyrug'i bilan bot yarating.",
+      "step2": "BotFather bergan tokenni shu yerga qo'ying: bot avtomatik sozlanadi.",
+      "step3": "Keyin \"Xabarlarni ulash\" orqali yangi buyurtmalar keladigan chatni bog'lang.",
+      "active": "Ishlayapti",
+      "inactive": "Ishlamayapti",
+      "needsHttps": "Bot ishlashi uchun server HTTPS manzilga ega bo'lishi kerak (PUBLIC_API_URL). Lokal kompyuterda bot ishlamaydi.",
+      "telegramSaid": "Telegram javobi: {{error}}",
+      "notifications": "Buyurtma xabarlari",
+      "linkHint": "Tugmani bosing va Telegram'da \"Start\" ni bosing. Xodimlar guruhiga xabar kelishini istasangiz, avval botni guruhga qo'shing, keyin havolani guruhda oching.",
+      "link": "Xabarlarni ulash",
+      "linked": "Ulangan: yangi buyurtmalar va har kuni 23:00 da hisobot shu chatga keladi.",
+      "test": "Test xabar yuborish",
+      "testSent": "Test xabar yuborildi",
+      "relink": "Boshqa chatga ulash",
+      "more": "Tokenni almashtirish yoki botni uzish",
+      "disconnect": "Botni uzish",
+      "disconnectTitle": "@{{name}} uzilsinmi?",
+      "disconnectHint": "Bot mijozlarga javob bermay qo'yadi va token o'chiriladi. Keyin qayta ulash mumkin."
     },
     "errors": {
       "nameRequired": "Kafe nomini kiriting"

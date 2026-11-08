@@ -25,6 +25,7 @@ import type {
 
 import type {
   CreatePublicOrderDto,
+  CreateTelegramOrderDto,
   PublicMenuDto,
   PublicOrderDto,
   PublicScreenDto,
@@ -511,3 +512,85 @@ export function usePublicControllerOrderStatus<TData = Awaited<ReturnType<typeof
 
 
 
+export const getTelegramOrdersControllerCreateUrl = (slug: string,) => {
+
+
+
+
+  return `/api/v1/public/cafes/${slug}/telegram-orders`
+}
+
+export const telegramOrdersControllerCreate = async (slug: string,
+    createTelegramOrderDto: CreateTelegramOrderDto, options?: Parameters<typeof apiFetch>[1]): Promise<PublicOrderDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<PublicOrderDto>(getTelegramOrdersControllerCreateUrl(slug),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createTelegramOrderDto)
+  }
+);}
+
+
+
+
+
+export const getTelegramOrdersControllerCreateMutationKey = () => ['telegramOrdersControllerCreate'] as const;
+
+export const getTelegramOrdersControllerCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof telegramOrdersControllerCreate>>, TError,TelegramOrdersControllerCreateMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof telegramOrdersControllerCreate>>, TError,TelegramOrdersControllerCreateMutationVariables, TContext> => {
+
+const mutationKey = getTelegramOrdersControllerCreateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof telegramOrdersControllerCreate>>, TelegramOrdersControllerCreateMutationVariables> = (props) => {
+          const {slug,data} = props ?? {};
+
+          return  telegramOrdersControllerCreate(slug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TelegramOrdersControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof telegramOrdersControllerCreate>>>
+    export type TelegramOrdersControllerCreateMutationBody = CreateTelegramOrderDto
+    export type TelegramOrdersControllerCreateMutationError = unknown
+    export type TelegramOrdersControllerCreateMutationVariables = {slug: string;data: CreateTelegramOrderDto}
+
+    export const useTelegramOrdersControllerCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof telegramOrdersControllerCreate>>, TError,TelegramOrdersControllerCreateMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof telegramOrdersControllerCreate>>,
+        TError,
+        TelegramOrdersControllerCreateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getTelegramOrdersControllerCreateMutationOptions(options), queryClient);
+    }

@@ -23,6 +23,8 @@ export * from './createPublicOrderDtoType';
 export * from './createStaffMemberDto';
 export * from './createStaffRoleDto';
 export * from './createTableDto';
+export * from './createTelegramOrderDto';
+export * from './createTelegramOrderDtoType';
 export * from './dashboardDto';
 export * from './dayHoursDto';
 export * from './errorResponseDto';

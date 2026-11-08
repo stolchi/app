@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, ImageUp, MonitorPlay, Send } from 'lucide-react';
+import { ImageUp, MonitorPlay } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import {
@@ -19,7 +19,6 @@ import { Label } from '@/components/ui/label';
 import {
   useCafesControllerCurrent,
   useCafesControllerSetLogo,
-  useCafesControllerSetTelegramBot,
   useCafesControllerUpdate,
 } from '@/shared/api/generated/cafes/cafes';
 import type { CafeDto } from '@/shared/api/generated/model';
@@ -31,6 +30,7 @@ import { FormField } from '@/shared/ui/FormField';
 import { Page } from '@/shared/ui/Page';
 import { QueryState } from '@/shared/ui/QueryState';
 import { OrderSettingsForm } from './OrderSettingsForm';
+import { TelegramSection } from './TelegramSection';
 import { SavedNote, Section, useCafeMutationOptions } from './settings-parts';
 import {
   DAYS,
@@ -67,8 +67,6 @@ const schema = z.object({
   address: z.string().trim().max(255),
   primaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
 });
-
-const TELEGRAM_TOKEN = /^\d{5,20}:[A-Za-z0-9_-]{30,64}$/;
 
 type CafeFormValues = z.input<typeof schema>;
 
@@ -313,61 +311,6 @@ function HoursFormSection({ cafe }: { cafe: CafeDto }) {
   );
 }
 
-function TelegramForm({ cafe }: { cafe: CafeDto }) {
-  const { t } = useTranslation();
-  const options = useCafeMutationOptions();
-  const [token, setToken] = useState('');
-  const [invalid, setInvalid] = useState(false);
-  const save = useCafesControllerSetTelegramBot({
-    mutation: {
-      onSuccess: (updated) => {
-        options.mutation.onSuccess(updated);
-        // The token should not stay on screen or in memory once it is stored.
-        setToken('');
-      },
-    },
-  });
-
-  return (
-    <form
-      className="space-y-3"
-      onSubmit={(event) => {
-        event.preventDefault();
-        const value = token.trim();
-        const valid = TELEGRAM_TOKEN.test(value);
-        setInvalid(!valid);
-        if (valid) save.mutate({ data: { token: value } });
-      }}
-    >
-      {cafe.telegramBot && (
-        <p className="flex items-center gap-2 text-sm text-emerald-700">
-          <Check className="size-4" />
-          {t('settings.telegram.saved')}
-        </p>
-      )}
-      <FormField
-        id="telegram-token"
-        label={t('settings.telegram.token')}
-        hint={t('settings.telegram.hint')}
-        type="password"
-        autoComplete="off"
-        error={invalid ? 'settings.telegram.invalid' : undefined}
-        value={token}
-        onChange={(event) => setToken(event.target.value)}
-      />
-      <ErrorText error={save.error} />
-      <Button
-        type="submit"
-        className="h-11 px-6"
-        disabled={save.isPending || token.trim() === ''}
-      >
-        <Send />
-        {t(cafe.telegramBot ? 'settings.telegram.replace' : 'common.save')}
-      </Button>
-    </form>
-  );
-}
-
 function ScreenLink({ slug }: { slug: string }) {
   const { t } = useTranslation();
   const url = `${window.location.origin}/screen/${slug}`;
@@ -420,7 +363,7 @@ export function SettingsPage() {
             <ScreenLink slug={cafe.data.slug} />
           </Section>
           <Section title={t('settings.sections.telegram')}>
-            <TelegramForm cafe={cafe.data} />
+            <TelegramSection cafe={cafe.data} />
           </Section>
         </div>
       )}
