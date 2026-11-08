@@ -54,6 +54,7 @@ export * from './publicTableDto';
 export * from './refreshResponseDto';
 export * from './registerDto';
 export * from './role';
+export * from './serviceMode';
 export * from './setAvailabilityDto';
 export * from './setTelegramBotDto';
 export * from './staffMemberDto';

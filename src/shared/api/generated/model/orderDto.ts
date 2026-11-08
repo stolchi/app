@@ -11,6 +11,14 @@ import type { OrderType } from './orderType';
 import type { PaymentDto } from './paymentDto';
 
 export interface OrderDto {
+  /** Whole so'm: the items alone. */
+  itemsTotal: number;
+  /** Of the items, for dine-in orders. */
+  serviceChargePercent: number;
+  serviceCharge: number;
+  packagingFee: number;
+  deliveryFee: number;
+  total: number;
   id: string;
   /** Restarts from 1 every business day. */
   number: number;
@@ -26,7 +34,6 @@ export interface OrderDto {
   customerName: string | null;
   /** @nullable */
   customerPhone: string | null;
-  total: number;
   paidAmount: number;
   /** @nullable */
   note: string | null;

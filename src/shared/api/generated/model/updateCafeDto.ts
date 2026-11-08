@@ -4,6 +4,8 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { OrderType } from './orderType';
+import type { ServiceMode } from './serviceMode';
 import type { WorkingHoursDto } from './workingHoursDto';
 
 export interface UpdateCafeDto {
@@ -20,4 +22,16 @@ export interface UpdateCafeDto {
   primaryColor?: string | null;
   /** @nullable */
   workingHours?: WorkingHoursDto | null;
+  serviceMode?: ServiceMode;
+  /** At least one. */
+  orderTypes?: OrderType[];
+  /**
+     * @minimum 0
+     * @maximum 50
+     */
+  serviceChargePercent?: number;
+  /** @minimum 0 */
+  packagingFee?: number;
+  /** @minimum 0 */
+  deliveryFee?: number;
 }

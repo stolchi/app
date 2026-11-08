@@ -9,13 +9,20 @@ import type { OrderType } from './orderType';
 import type { PublicOrderItemDto } from './publicOrderItemDto';
 
 export interface PublicOrderDto {
+  /** Whole so'm: the items alone. */
+  itemsTotal: number;
+  /** Of the items, for dine-in orders. */
+  serviceChargePercent: number;
+  serviceCharge: number;
+  packagingFee: number;
+  deliveryFee: number;
+  total: number;
   /** Use for the status page and the socket connection. */
   publicToken: string;
   number: number;
   displayNumber: string;
   status: OrderStatus;
   type: OrderType;
-  total: number;
   createdAt: string;
   items: PublicOrderItemDto[];
 }

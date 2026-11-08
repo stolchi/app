@@ -4,6 +4,7 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { OrderType } from './orderType';
 import type { PublicCafeDtoWorkingHours } from './publicCafeDtoWorkingHours';
 
 export interface PublicCafeDto {
@@ -20,4 +21,12 @@ export interface PublicCafeDto {
   /** @nullable */
   workingHours: PublicCafeDtoWorkingHours;
   currency: string;
+  /** The kinds of order the cafe takes. */
+  orderTypes: OrderType[];
+  /** Added to dine-in orders. */
+  serviceChargePercent: number;
+  /** Whole so'm per takeaway or delivery order. */
+  packagingFee: number;
+  /** Whole so'm per delivery order. */
+  deliveryFee: number;
 }

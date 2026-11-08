@@ -4,6 +4,8 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { OrderType } from './orderType';
+import type { ServiceMode } from './serviceMode';
 import type { TelegramBotStatusDto } from './telegramBotStatusDto';
 import type { WorkingHoursDto } from './workingHoursDto';
 
@@ -22,6 +24,17 @@ export interface CafeDto {
   address: string | null;
   /** @nullable */
   workingHours: WorkingHoursDto | null;
+  serviceMode: ServiceMode;
+  orderTypes: OrderType[];
+  /**
+     * @minimum 0
+     * @maximum 50
+     */
+  serviceChargePercent: number;
+  /** Whole so'm per takeaway or delivery order. */
+  packagingFee: number;
+  /** Whole so'm per delivery order. */
+  deliveryFee: number;
   /**
      * The token itself is never returned.
      * @nullable

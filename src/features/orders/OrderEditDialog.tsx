@@ -16,6 +16,7 @@ import { useProductsControllerList } from '@/shared/api/generated/products/produ
 import type { OrderDto } from '@/shared/api/generated/model';
 import { ApiPath, invalidate } from '@/shared/api/invalidate';
 import { formatMoney } from '@/shared/lib/format';
+import { amountsOf } from '@/shared/lib/order-charges';
 import { celebrate } from '@/shared/ui/Celebration';
 import { ErrorText } from '@/shared/ui/ErrorText';
 import {
@@ -27,6 +28,7 @@ import {
   totalOf,
   type EditLine,
 } from './edit-lines';
+import { OrderAmounts } from './OrderAmounts';
 import { isStarted } from './order-rules';
 
 function ProductPicker({
@@ -169,10 +171,8 @@ function EditForm({ order, onDone }: { order: OrderDto; onDone: () => void }) {
       <ProductPicker
         onPick={(product) => setLines(addProduct(lines, product))}
       />
-      <div className="flex items-baseline justify-between font-semibold">
-        <span>{t('orders.total')}</span>
-        <span className="text-lg">{formatMoney(totalOf(lines))}</span>
-      </div>
+      {/* The order keeps the rates it was placed with. */}
+      <OrderAmounts amounts={amountsOf(totalOf(lines), order)} />
       {isStarted(order.status) && addsFood(order, lines) && (
         <p
           role="status"

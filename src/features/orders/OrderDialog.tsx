@@ -33,6 +33,7 @@ import {
   mayTakePayment,
   nextStatus,
 } from './order-rules';
+import { OrderAmounts } from './OrderAmounts';
 import { OrderEditDialog } from './OrderEditDialog';
 import { PaymentDialog } from './PaymentDialog';
 import { TablePicker } from './TablePicker';
@@ -223,11 +224,8 @@ function OrderBody({ order }: { order: OrderDto }) {
         ))}
       </ul>
       {order.note && <p className="text-sm">{order.note}</p>}
+      <OrderAmounts amounts={order} />
       <dl className="space-y-1 text-sm">
-        <div className="flex justify-between text-base font-semibold">
-          <dt>{t('orders.total')}</dt>
-          <dd>{formatMoney(order.total)}</dd>
-        </div>
         {order.payments.map((payment) => (
           <div
             key={payment.id}

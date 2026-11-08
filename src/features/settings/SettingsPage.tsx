@@ -1,8 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQueryClient } from '@tanstack/react-query';
 import { Check, ImageUp, MonitorPlay, Send } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import {
   Controller,
   useForm,
@@ -24,7 +23,6 @@ import {
   useCafesControllerUpdate,
 } from '@/shared/api/generated/cafes/cafes';
 import type { CafeDto } from '@/shared/api/generated/model';
-import { ApiPath, invalidate } from '@/shared/api/invalidate';
 import { assetUrl, IMAGE_ACCEPT, imageProblem } from '@/shared/lib/assets';
 import { readablePrimary } from '@/shared/lib/cafe-theme';
 import { normalizePhone, PHONE_PATTERN } from '@/shared/lib/phone';
@@ -32,6 +30,8 @@ import { ErrorText } from '@/shared/ui/ErrorText';
 import { FormField } from '@/shared/ui/FormField';
 import { Page } from '@/shared/ui/Page';
 import { QueryState } from '@/shared/ui/QueryState';
+import { OrderSettingsForm } from './OrderSettingsForm';
+import { SavedNote, Section, useCafeMutationOptions } from './settings-parts';
 import {
   DAYS,
   toHoursDto,
@@ -69,41 +69,6 @@ const schema = z.object({
 });
 
 const TELEGRAM_TOKEN = /^\d{5,20}:[A-Za-z0-9_-]{30,64}$/;
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="space-y-4 rounded-2xl border bg-card shadow-xs p-5">
-      <h2 className="font-semibold">{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function SavedNote({ visible }: { visible: boolean }) {
-  const { t } = useTranslation();
-  if (!visible) return null;
-  return (
-    <span
-      role="status"
-      className="flex items-center gap-1 text-sm text-emerald-700"
-    >
-      <Check className="size-4" />
-      {t('common.saved')}
-    </span>
-  );
-}
-
-function useCafeMutationOptions() {
-  const queryClient = useQueryClient();
-  return {
-    mutation: {
-      onSuccess: (cafe: CafeDto) => {
-        queryClient.setQueryData([ApiPath.cafe], cafe);
-        void invalidate(queryClient, ApiPath.cafe);
-      },
-    },
-  };
-}
 
 type CafeFormValues = z.input<typeof schema>;
 
@@ -444,6 +409,9 @@ export function SettingsPage() {
           </Section>
           <Section title={t('settings.sections.logo')}>
             <LogoForm cafe={cafe.data} />
+          </Section>
+          <Section title={t('settings.sections.orders')}>
+            <OrderSettingsForm cafe={cafe.data} />
           </Section>
           <Section title={t('settings.sections.hours')}>
             <HoursFormSection cafe={cafe.data} />

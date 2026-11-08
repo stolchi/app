@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { OrderDialog } from '@/features/orders/OrderDialog';
+import { OrderAmounts } from '@/features/orders/OrderAmounts';
 import { mayTakePayment } from '@/features/orders/order-rules';
 import { SourceBadge } from '@/features/orders/SourceBadge';
 import { StatusBadge } from '@/features/orders/StatusBadge';
@@ -49,6 +50,7 @@ import { SoundHint } from '@/shared/ui/SoundHint';
 import { activeDraft, useActiveCart, useCartStore } from './cart-store';
 import { DraftTabs } from './DraftTabs';
 import { flyToCart } from './fly-to-cart';
+import { useCartAmounts } from './use-cart-amounts';
 
 const ACTIVE_ORDERS = { active: true, limit: 100 } as const;
 
@@ -156,28 +158,26 @@ function Cart({
     const product = products.find(({ id }) => id === line.productId);
     return product ? [{ ...line, product }] : [];
   });
-  const total = lines.reduce(
-    (sum, { product, quantity }) => sum + product.price * quantity,
-    0,
-  );
+  const { offered, type, amounts } = useCartAmounts(cart, products);
   const soldOut = lines.filter(({ product }) => !product.isAvailable);
   const table = tables.find(({ id }) => id === cart.tableId);
-  const tableSelected = cart.type === 'TAKEAWAY' || table !== undefined;
+  const tableSelected = type === 'TAKEAWAY' || table !== undefined;
   const canSend =
+    type !== undefined &&
     lines.length > 0 &&
     soldOut.length === 0 &&
     tableSelected &&
     !createOrder.isPending;
 
   const send = () => {
-    if (!canSend) return;
+    if (!canSend || !type) return;
     // By the time the answer comes, the user may be serving someone else.
     const draftId = cart.id;
     createOrder.mutate(
       {
         data: {
-          type: cart.type,
-          ...(cart.type === 'DINE_IN' && { tableId: cart.tableId }),
+          type,
+          ...(type === 'DINE_IN' && { tableId: cart.tableId }),
           items: lines.map(({ productId, quantity, note }) => ({
             productId,
             quantity,
@@ -199,9 +199,13 @@ function Cart({
   useShortcuts({
     'ctrl+enter': send,
     s: () => {
-      if (cart.type === 'DINE_IN') setPickingTable(true);
+      if (type === 'DINE_IN') setPickingTable(true);
     },
-    t: () => cart.setType(cart.type === 'DINE_IN' ? 'TAKEAWAY' : 'DINE_IN'),
+    t: () => {
+      if (offered.length > 1) {
+        cart.setType(type === 'DINE_IN' ? 'TAKEAWAY' : 'DINE_IN');
+      }
+    },
     n: cart.startNew,
   });
 
@@ -209,25 +213,24 @@ function Cart({
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="space-y-2 border-b p-3">
         <DraftTabs className="hidden md:flex" />
-        <Segmented
-          id="order-type"
-          value={cart.type}
-          onChange={cart.setType}
-          options={[
-            {
-              value: 'DINE_IN',
-              label: t('orders.type.DINE_IN'),
-              icon: <UtensilsCrossed />,
-            },
-            {
-              value: 'TAKEAWAY',
-              label: t('orders.type.TAKEAWAY'),
-              icon: <ShoppingBag />,
-            },
-          ]}
-          itemClassName="flex-1"
-        />
-        {cart.type === 'DINE_IN' && (
+        {/* A cafe that takes one kind of order has nothing to choose here. */}
+        {offered.length > 1 && type && (
+          <Segmented
+            id="order-type"
+            value={type}
+            onChange={cart.setType}
+            options={offered.map((value) => ({
+              value,
+              label: t(`orders.type.${value}`),
+              icon: value === 'DINE_IN' ? <UtensilsCrossed /> : <ShoppingBag />,
+            }))}
+            itemClassName="flex-1"
+          />
+        )}
+        {!type && (
+          <p className="text-sm text-destructive">{t('pos.noOrderTypes')}</p>
+        )}
+        {type === 'DINE_IN' && (
           <Button
             variant={table ? 'secondary' : 'outline'}
             className="h-12 w-full justify-between px-4 text-base"
@@ -329,14 +332,7 @@ function Cart({
 
       <div className="space-y-2 border-t bg-card p-3">
         <ErrorText error={createOrder.error} />
-        <div className="flex items-baseline justify-between">
-          <span className="font-medium text-muted-foreground">
-            {t('orders.total')}
-          </span>
-          <span className="font-heading text-2xl font-bold">
-            <AnimatedNumber value={total} format={formatMoney} />
-          </span>
-        </div>
+        <OrderAmounts amounts={amounts} animated size="large" />
         <Button
           className="h-14 w-full text-lg"
           disabled={!canSend}
@@ -541,7 +537,8 @@ export function PosPage({
   const cartCount = useCartStore((state) =>
     activeDraft(state).lines.reduce((sum, line) => sum + line.quantity, 0),
   );
-  const cartLines = useCartStore((state) => activeDraft(state).lines);
+  const draft = useCartStore(activeDraft);
+  const cartTotal = useCartAmounts(draft, products.data ?? []).amounts.total;
   const [categoryId, setCategoryId] = useState('all');
   const [panel, setPanel] = useState<Panel>('menu');
   const [openOrderId, setOpenOrderId] = useState<string | null>(null);
@@ -630,10 +627,6 @@ export function PosPage({
   const newOrders =
     activeOrders.data?.items.filter((order) => order.status === 'NEW').length ??
     0;
-  const cartTotal = cartLines.reduce((sum, line) => {
-    const product = products.data.find(({ id }) => id === line.productId);
-    return sum + (product?.price ?? 0) * line.quantity;
-  }, 0);
   const sidePanel = panel === 'orders' ? 'orders' : 'cart';
   const counted = (label: string, count: number) =>
     count > 0 ? `${label} (${count})` : label;

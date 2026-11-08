@@ -33,7 +33,17 @@ const TABLES = [
   { id: 't2', name: 'Stol 2', zone: null, qrToken: 'b', menuUrl: 'y' },
 ];
 
-function stubApi(onCreate: (body: unknown) => Response) {
+const CAFE = {
+  id: 'c',
+  name: 'Cafe',
+  slug: 'cafe',
+  orderTypes: ['DINE_IN', 'TAKEAWAY'],
+  serviceChargePercent: 0,
+  packagingFee: 0,
+  deliveryFee: 0,
+};
+
+function stubApi(onCreate: (body: unknown) => Response, cafe: object = CAFE) {
   const posts: unknown[] = [];
   vi.stubGlobal(
     'fetch',
@@ -49,6 +59,7 @@ function stubApi(onCreate: (body: unknown) => Response) {
       if (path === '/api/v1/categories') return json([CATEGORY]);
       if (path === '/api/v1/products') return json([OSH, SOMSA, NOT_LEFT]);
       if (path === '/api/v1/tables') return json(TABLES);
+      if (path === '/api/v1/cafes/current') return json(cafe);
       if (path === '/api/v1/orders') {
         return json({ items: [], total: 0, page: 1, limit: 100 });
       }
@@ -199,6 +210,46 @@ describe('PosPage', () => {
     await userEvent.click(send);
     await waitFor(() => expect(posts).toHaveLength(1));
     expect(posts[0]).toMatchObject({ type: 'DINE_IN', tableId: 't2' });
+  });
+
+  it('adds the service charge to a dine-in order', async () => {
+    stubApi(created, { ...CAFE, serviceChargePercent: 10, packagingFee: 2000 });
+    renderPage();
+    await userEvent.click(await tile(/^Osh.*so'm/));
+    expect(
+      await screen.findByText(
+        uz.orders.amounts.service.replace('{{percent}}', '10'),
+      ),
+    ).toBeVisible();
+    expect(screen.getByText("4 500 so'm")).toBeVisible();
+    await waitFor(() =>
+      expect(screen.getAllByText("49 500 so'm")[0]).toBeVisible(),
+    );
+  });
+
+  it('offers only what the cafe takes, with its packaging fee', async () => {
+    const posts = stubApi(created, {
+      ...CAFE,
+      orderTypes: ['TAKEAWAY'],
+      serviceChargePercent: 10,
+      packagingFee: 2000,
+    });
+    renderPage();
+    await userEvent.click(await tile(/^Osh.*so'm/));
+    expect(await screen.findByText(uz.orders.amounts.packaging)).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: uz.orders.type.TAKEAWAY }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: uz.pos.chooseTable }),
+    ).toBeNull();
+    await waitFor(() =>
+      expect(screen.getAllByText("47 000 so'm")[0]).toBeVisible(),
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: uz.pos.send }));
+    await waitFor(() => expect(posts).toHaveLength(1));
+    expect(posts[0]).toMatchObject({ type: 'TAKEAWAY' });
   });
 
   it('cannot add a sold-out product', async () => {

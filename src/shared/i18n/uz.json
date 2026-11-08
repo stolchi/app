@@ -260,6 +260,12 @@
     },
     "history": {
       "empty": "Bu kunda yopilgan buyurtma yo'q"
+    },
+    "amounts": {
+      "items": "Taomlar",
+      "service": "Xizmat haqi {{percent}}%",
+      "packaging": "Qadoq",
+      "delivery": "Yetkazib berish"
     }
   },
   "pos": {
@@ -298,7 +304,8 @@
     "draft": "{{number}}-mijoz",
     "newDraft": "Yangi mijoz",
     "removeDraft": "{{name}} savatini o'chirish",
-    "removeDraftQuestion": "{{name}} savati o'chirilsinmi?"
+    "removeDraftQuestion": "{{name}} savati o'chirilsinmi?",
+    "noOrderTypes": "Kafe sozlamalarida buyurtma turi yoqilmagan"
   },
   "kitchen": {
     "minutes": "{{minutes}} daqiqa",
@@ -343,7 +350,8 @@
       "logo": "Logotip",
       "hours": "Ish vaqti",
       "telegram": "Telegram bot",
-      "screen": "Mijozlar ekrani"
+      "screen": "Mijozlar ekrani",
+      "orders": "Buyurtmalar"
     },
     "fields": {
       "name": "Kafe nomi",
@@ -380,6 +388,18 @@
     "screen": {
       "hint": "Bu sahifani mijozlar ko'radigan monitorda oching. Unga kirish uchun login kerak emas va unda faqat buyurtma raqamlari ko'rinadi.",
       "open": "Ekranni ochish"
+    },
+    "orders": {
+      "types": "Qanday buyurtma olasiz",
+      "typesHint": "O'chirilgan tur kassada ham, QR menyuda ham chiqmaydi.",
+      "typeRequired": "Kamida bitta turni qoldiring",
+      "serviceCharge": "Xizmat haqi (%)",
+      "serviceChargeHint": "Faqat \"Stolda\" buyurtmaga qo'shiladi. 0 bo'lsa olinmaydi.",
+      "packagingFee": "Qadoq narxi (so'm)",
+      "packagingFeeHint": "Har bir \"Olib ketish\" buyurtmasiga bir marta qo'shiladi.",
+      "percentInvalid": "0 dan 50 gacha butun son kiriting",
+      "amountInvalid": "Summani butun son bilan kiriting",
+      "laterHint": "O'zgarish yangi buyurtmalarga qo'llanadi. Ochiq buyurtmalar eski narxlarida qoladi."
     }
   },
   "shortcuts": {
