@@ -302,6 +302,43 @@ describe('PosPage', () => {
     });
   });
 
+  it('takes a delivery on the phone, with a number and an address', async () => {
+    const posts = stubApi(created, {
+      ...CAFE,
+      orderTypes: ['DINE_IN', 'TAKEAWAY', 'DELIVERY'],
+      packagingFee: 2000,
+      deliveryFee: 15000,
+    });
+    renderPage();
+    await userEvent.click(await tile(/^Osh.*so'm/));
+    await userEvent.click(
+      await screen.findByRole('button', { name: uz.orders.type.DELIVERY }),
+    );
+    const send = screen.getByRole('button', { name: uz.pos.send });
+    expect(send).toBeDisabled();
+    expect(screen.getByText(uz.pos.deliveryHint)).toBeVisible();
+
+    await userEvent.type(
+      screen.getByLabelText(uz.delivery.phone),
+      '90 111 22 33',
+    );
+    await userEvent.type(
+      screen.getByLabelText(uz.delivery.address),
+      'Chilonzor 9',
+    );
+    expect(screen.getByText("15 000 so'm")).toBeVisible();
+    await waitFor(() =>
+      expect(screen.getAllByText("62 000 so'm")[0]).toBeVisible(),
+    );
+    await userEvent.click(send);
+    await waitFor(() => expect(posts).toHaveLength(1));
+    expect(posts[0]).toMatchObject({
+      type: 'DELIVERY',
+      customerPhone: '+998901112233',
+      address: 'Chilonzor 9',
+    });
+  });
+
   it('cannot add a sold-out product', async () => {
     stubApi(created);
     renderPage();

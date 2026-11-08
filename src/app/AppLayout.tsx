@@ -35,6 +35,7 @@ import { Celebration } from '@/shared/ui/Celebration';
 import { LoadingBlocks } from '@/shared/ui/QueryState';
 import { useSidebarStore } from '@/shared/ui/sidebar-store';
 import { navItemsFor } from './nav';
+import { useCafeFeatures } from './use-cafe-features';
 
 function useSignOut() {
   const signOut = useSessionStore((state) => state.signOut);
@@ -53,6 +54,7 @@ function useSignOut() {
 function SideNavigation() {
   const { t } = useTranslation();
   const permissions = usePermissions();
+  const features = useCafeFeatures();
   const { collapsed, toggle } = useSidebarStore();
   return (
     <nav
@@ -70,7 +72,7 @@ function SideNavigation() {
         <Store className="size-6 shrink-0 text-amber-400" />
         {!collapsed && t('brand.name')}
       </p>
-      {navItemsFor(permissions).map(({ path, label, icon: Icon }) => (
+      {navItemsFor(permissions, features).map(({ path, label, icon: Icon }) => (
         <NavLink
           key={path}
           to={path}
@@ -185,6 +187,7 @@ function ShortcutsDialog({
 function BottomNavigation() {
   const { t } = useTranslation();
   const permissions = usePermissions();
+  const features = useCafeFeatures();
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -202,7 +205,7 @@ function BottomNavigation() {
       data-bottom-nav
       className="flex shrink-0 gap-0.5 overflow-x-auto border-t bg-card px-1 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] [scrollbar-width:none] md:hidden"
     >
-      {navItemsFor(permissions).map(({ path, label, icon: Icon }) => (
+      {navItemsFor(permissions, features).map(({ path, label, icon: Icon }) => (
         <NavLink
           key={path}
           to={path}
@@ -328,9 +331,10 @@ function TopBar({ onShowShortcuts }: { onShowShortcuts: () => void }) {
 
 export function AppLayout() {
   const permissions = usePermissions();
+  const features = useCafeFeatures();
   const { pathname } = useLocation();
   // A cook has one screen, and it needs all the room it can get.
-  const items = navItemsFor(permissions);
+  const items = navItemsFor(permissions, features);
   const hasMenu = items.length > 1;
   const navigate = useNavigate();
   const toggleSidebar = useSidebarStore((state) => state.toggle);

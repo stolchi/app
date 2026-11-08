@@ -47,7 +47,7 @@ describe('OrderSettingsForm', () => {
     vi.unstubAllGlobals();
   });
 
-  it('saves the kinds of order and the charges, keeping delivery as it was', async () => {
+  it('saves the kinds of order and the charges, with the delivery fee', async () => {
     const bodies = stubPatch();
     renderForm();
     await userEvent.click(
@@ -59,6 +59,9 @@ describe('OrderSettingsForm', () => {
     const packaging = screen.getByLabelText(uz.settings.orders.packagingFee);
     await userEvent.clear(packaging);
     await userEvent.type(packaging, '2 000');
+    const delivery = screen.getByLabelText(uz.settings.orders.deliveryFee);
+    await userEvent.clear(delivery);
+    await userEvent.type(delivery, '15000');
     await userEvent.click(screen.getByRole('button', { name: uz.common.save }));
 
     await waitFor(() => expect(bodies).toHaveLength(1));
@@ -66,6 +69,7 @@ describe('OrderSettingsForm', () => {
       orderTypes: ['DINE_IN', 'DELIVERY'],
       serviceChargePercent: 10,
       packagingFee: 2000,
+      deliveryFee: 15000,
     });
   });
 

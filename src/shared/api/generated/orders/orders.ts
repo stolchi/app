@@ -26,12 +26,14 @@ import type {
 import type {
   AddPaymentDto,
   AddPaymentsDto,
+  CancelOrderDto,
   ChangeStatusDto,
   CreateOrderDto,
   MoveOrderDto,
   OrderDto,
   OrderPageDto,
   OrdersControllerListParams,
+  UpdateOrderCustomerDto,
   UpdateOrderItemsDto
 } from '../model';
 
@@ -605,14 +607,29 @@ export const useOrdersControllerMoveToTable = <TError = unknown,
   return `/api/v1/orders/${id}/cancel`
 }
 
-export const ordersControllerCancel = async (id: string, options?: Parameters<typeof apiFetch>[1]): Promise<OrderDto> => {
+export const ordersControllerCancel = async (id: string,
+    cancelOrderDto: CancelOrderDto, options?: Parameters<typeof apiFetch>[1]): Promise<OrderDto> => {
 
-  return apiFetch<OrderDto>(getOrdersControllerCancelUrl(id),
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<OrderDto>(getOrdersControllerCancelUrl(id),
   {
     ...options,
-    method: 'POST'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(cancelOrderDto)
   }
 );}
 
@@ -637,9 +654,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof ordersControllerCancel>>, OrdersControllerCancelMutationVariables> = (props) => {
-          const {id} = props ?? {};
+          const {id,data} = props ?? {};
 
-          return  ordersControllerCancel(id,requestOptions)
+          return  ordersControllerCancel(id,data,requestOptions)
         }
 
 
@@ -650,9 +667,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type OrdersControllerCancelMutationResult = NonNullable<Awaited<ReturnType<typeof ordersControllerCancel>>>
-
+    export type OrdersControllerCancelMutationBody = CancelOrderDto
     export type OrdersControllerCancelMutationError = unknown
-    export type OrdersControllerCancelMutationVariables = {id: string}
+    export type OrdersControllerCancelMutationVariables = {id: string;data: CancelOrderDto}
 
     export const useOrdersControllerCancel = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerCancel>>, TError,OrdersControllerCancelMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
@@ -663,6 +680,94 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getOrdersControllerCancelMutationOptions(options), queryClient);
+    }
+    export const getOrdersControllerUpdateCustomerUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/orders/${id}/customer`
+}
+
+/**
+ * @summary Change the customer's name, phone or address
+ */
+export const ordersControllerUpdateCustomer = async (id: string,
+    updateOrderCustomerDto: UpdateOrderCustomerDto, options?: Parameters<typeof apiFetch>[1]): Promise<OrderDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<OrderDto>(getOrdersControllerUpdateCustomerUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateOrderCustomerDto)
+  }
+);}
+
+
+
+
+
+export const getOrdersControllerUpdateCustomerMutationKey = () => ['ordersControllerUpdateCustomer'] as const;
+
+export const getOrdersControllerUpdateCustomerMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerUpdateCustomer>>, TError,OrdersControllerUpdateCustomerMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ordersControllerUpdateCustomer>>, TError,OrdersControllerUpdateCustomerMutationVariables, TContext> => {
+
+const mutationKey = getOrdersControllerUpdateCustomerMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ordersControllerUpdateCustomer>>, OrdersControllerUpdateCustomerMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  ordersControllerUpdateCustomer(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrdersControllerUpdateCustomerMutationResult = NonNullable<Awaited<ReturnType<typeof ordersControllerUpdateCustomer>>>
+    export type OrdersControllerUpdateCustomerMutationBody = UpdateOrderCustomerDto
+    export type OrdersControllerUpdateCustomerMutationError = unknown
+    export type OrdersControllerUpdateCustomerMutationVariables = {id: string;data: UpdateOrderCustomerDto}
+
+    /**
+ * @summary Change the customer's name, phone or address
+ */
+export const useOrdersControllerUpdateCustomer = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ordersControllerUpdateCustomer>>, TError,OrdersControllerUpdateCustomerMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof ordersControllerUpdateCustomer>>,
+        TError,
+        OrdersControllerUpdateCustomerMutationVariables,
+        TContext
+      > => {
+      return useMutation(getOrdersControllerUpdateCustomerMutationOptions(options), queryClient);
     }
     export const getOrdersControllerAddPaymentUrl = (id: string,) => {
 

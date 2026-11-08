@@ -7,6 +7,7 @@ import {
   QrCode,
   Settings,
   ShoppingCart,
+  Truck,
   Users,
   UtensilsCrossed,
 } from 'lucide-react';
@@ -20,7 +21,16 @@ export interface NavItem {
   label: string;
   icon: LucideIcon;
   allowed: (permissions: Permissions) => boolean;
+  /** Shown only to a cafe that has turned this on. */
+  feature?: keyof CafeFeatures;
 }
+
+/** What a cafe has chosen to use, from its settings. */
+export interface CafeFeatures {
+  delivery: boolean;
+}
+
+const NO_FEATURES: CafeFeatures = { delivery: false };
 
 const holds =
   (permission: Permission) =>
@@ -66,6 +76,13 @@ export const NAV_ITEMS: readonly NavItem[] = [
     allowed: holds(Permission.ORDERS_VIEW),
   },
   {
+    path: '/delivery',
+    label: 'nav.delivery',
+    icon: Truck,
+    allowed: holds(Permission.ORDERS_VIEW),
+    feature: 'delivery',
+  },
+  {
     path: '/menu',
     label: 'nav.menu',
     icon: UtensilsCrossed,
@@ -91,8 +108,14 @@ export const NAV_ITEMS: readonly NavItem[] = [
   },
 ];
 
-export const navItemsFor = (permissions: Permissions) =>
-  NAV_ITEMS.filter((item) => item.allowed(permissions));
+export const navItemsFor = (
+  permissions: Permissions,
+  features: CafeFeatures = NO_FEATURES,
+) =>
+  NAV_ITEMS.filter(
+    (item) =>
+      item.allowed(permissions) && (!item.feature || features[item.feature]),
+  );
 
 /** The first page a user can open is where they land after signing in. */
 export const homePathFor = (permissions: Permissions) =>

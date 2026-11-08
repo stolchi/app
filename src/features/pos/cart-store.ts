@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { ProductUnit } from '@/shared/api/generated/model';
 import { useSessionStore } from '@/shared/auth/session-store';
+import type { Point } from '@/shared/lib/geo';
 import { MAX_GRAMS } from '@/shared/lib/quantity';
 
 export const MAX_QUANTITY = 999;
@@ -21,7 +22,7 @@ export const lineKey = (productId: string, variantId?: string) =>
 
 const maxOf = (unit: ProductUnit) => (unit === 'KG' ? MAX_GRAMS : MAX_QUANTITY);
 
-export type CartOrderType = 'DINE_IN' | 'TAKEAWAY';
+export type CartOrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY';
 
 /** One customer's order in the making. Names and prices come from the live menu. */
 export interface CartDraft {
@@ -30,6 +31,13 @@ export interface CartDraft {
   lines: CartLine[];
   type: CartOrderType;
   tableId: string;
+  /** Who a delivery goes to, as told on the phone. */
+  customer: {
+    phone: string;
+    name: string;
+    address: string;
+    location: Point | null;
+  };
 }
 
 interface CartState {
@@ -44,6 +52,7 @@ interface CartState {
   setNote: (key: string, note: string) => void;
   setType: (type: CartOrderType) => void;
   setTableId: (tableId: string) => void;
+  setCustomer: (customer: Partial<CartDraft['customer']>) => void;
   /** Sets the current customer aside and starts on another. */
   startNew: () => void;
   switchTo: (id: number) => void;
@@ -57,10 +66,16 @@ const newDraft = (id: number): CartDraft => ({
   lines: [],
   type: 'DINE_IN',
   tableId: '',
+  customer: { phone: '', name: '', address: '', location: null },
 });
 
-const isEmpty = ({ lines, tableId }: CartDraft) =>
-  lines.length === 0 && tableId === '';
+const isEmpty = ({ lines, tableId, customer }: CartDraft) =>
+  lines.length === 0 &&
+  tableId === '' &&
+  !customer.phone &&
+  !customer.name &&
+  !customer.address &&
+  !customer.location;
 
 const firstFreeId = (drafts: readonly CartDraft[]) => {
   let id = 1;
@@ -143,6 +158,8 @@ export const useCartStore = create<CartState>((set) => {
       })),
     setType: (type) => patchActive(() => ({ type })),
     setTableId: (tableId) => patchActive(() => ({ tableId })),
+    setCustomer: (change) =>
+      patchActive(({ customer }) => ({ customer: { ...customer, ...change } })),
     startNew: () =>
       set((state) => {
         // Nothing to set aside yet: this draft is already the new one.

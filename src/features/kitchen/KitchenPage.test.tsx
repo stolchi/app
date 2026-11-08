@@ -152,10 +152,11 @@ describe('KitchenPage', () => {
     vi.unstubAllGlobals();
   });
 
-  it('sorts orders into columns, oldest first, leaving out served ones', async () => {
+  it('sorts orders into columns, oldest first, leaving out served and unaccepted ones', async () => {
     stubApi([
-      order('b', 2, 'NEW', '2026-01-31T10:05:00Z'),
+      order('b', 2, 'ACCEPTED', '2026-01-31T10:05:00Z'),
       order('a', 1, 'ACCEPTED', '2026-01-31T10:00:00Z'),
+      order('f', 6, 'NEW', '2026-01-31T09:00:00Z'),
       order('c', 3, 'COOKING', '2026-01-31T10:00:00Z'),
       order('d', 4, 'READY', '2026-01-31T10:00:00Z'),
       order('e', 5, 'SERVED', '2026-01-31T10:00:00Z'),
@@ -174,17 +175,20 @@ describe('KitchenPage', () => {
       within(await column(uz.kitchen.columns.ready)).getByText('#4'),
     ).toBeVisible();
     expect(screen.queryByText('#5')).toBeNull();
+    expect(screen.queryByText('#6')).toBeNull();
     expect(await within(fresh).findAllByText('Stol 3')).toHaveLength(2);
     expect(within(fresh).getAllByText('Piyozsiz')).toHaveLength(2);
   });
 
-  it('takes a new order through every step the backend needs, in order', async () => {
-    const changes = stubApi([order('a', 1, 'NEW', '2026-01-31T10:00:00Z')]);
+  it('starts cooking an accepted order', async () => {
+    const changes = stubApi([
+      order('a', 1, 'ACCEPTED', '2026-01-31T10:00:00Z'),
+    ]);
     renderAs('COOK');
     await userEvent.click(
       await screen.findByRole('button', { name: uz.kitchen.move.COOKING }),
     );
-    await waitFor(() => expect(changes).toEqual(['a:ACCEPTED', 'a:COOKING']));
+    await waitFor(() => expect(changes).toEqual(['a:COOKING']));
   });
 
   it('gives a cook no way to mark an order served, but a cashier one', async () => {

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import type { OrderStatus } from '@/shared/api/generated/model';
+import type { OrderStatus, OrderType } from '@/shared/api/generated/model';
 
 const COLORS: Record<OrderStatus, string> = {
   NEW: 'bg-primary/15 text-primary',
@@ -12,7 +12,14 @@ const COLORS: Record<OrderStatus, string> = {
   CANCELLED: 'bg-destructive/10 text-destructive',
 };
 
-export function StatusBadge({ status }: { status: OrderStatus }) {
+export function StatusBadge({
+  status,
+  type,
+}: {
+  status: OrderStatus;
+  /** A delivery that has been served is on its way. */
+  type?: OrderType;
+}) {
   const { t } = useTranslation();
   return (
     <span
@@ -21,7 +28,11 @@ export function StatusBadge({ status }: { status: OrderStatus }) {
         COLORS[status],
       )}
     >
-      {t(`orders.status.${status}`)}
+      {t(
+        type === 'DELIVERY' && status === 'SERVED'
+          ? 'orders.deliveryStatus.SERVED'
+          : `orders.status.${status}`,
+      )}
     </span>
   );
 }

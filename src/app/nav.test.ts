@@ -58,4 +58,13 @@ describe('permission-based menu', () => {
     expect(paths([])).toEqual([]);
     expect(homePathFor([])).toBeUndefined();
   });
+
+  it('shows delivery only to a cafe that has turned it on', () => {
+    expect(navItemsFor([ORDERS_VIEW]).map((item) => item.path)).toEqual([
+      '/orders',
+    ]);
+    expect(
+      navItemsFor([ORDERS_VIEW], { delivery: true }).map((item) => item.path),
+    ).toEqual(['/orders', '/delivery']);
+  });
 });

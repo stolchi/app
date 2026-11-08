@@ -70,7 +70,8 @@
     "menu": "Menyu",
     "tables": "Stollar va QR",
     "staff": "Xodimlar",
-    "settings": "Sozlamalar"
+    "settings": "Sozlamalar",
+    "delivery": "Yetkazib berish"
   },
   "layout": {
     "logout": "Chiqish",
@@ -284,7 +285,23 @@
       "service": "Xizmat haqi {{percent}}%",
       "packaging": "Qadoq",
       "delivery": "Yetkazib berish"
-    }
+    },
+    "cancelReason": "Sababi (mijozga ko'rsatiladi)",
+    "cancelReasonHint": "Majburiy emas",
+    "cancelReasons": {
+      "soldOut": "Taom tugagan",
+      "declined": "Mijoz rozi bo'lmadi",
+      "noAnswer": "Mijoz telefonga javob bermadi",
+      "customer": "Mijoz bekor qildi",
+      "other": "Boshqa sabab"
+    },
+    "deliveryStatus": {
+      "SERVED": "Yo'lda"
+    },
+    "deliveryAdvance": {
+      "SERVED": "Kuryerga berildi"
+    },
+    "cancelledBecause": "Bekor qilish sababi: {{reason}}"
   },
   "pos": {
     "allCategories": "Hammasi",
@@ -324,7 +341,8 @@
     "removeDraft": "{{name}} savatini o'chirish",
     "removeDraftQuestion": "{{name}} savati o'chirilsinmi?",
     "noOrderTypes": "Kafe sozlamalarida buyurtma turi yoqilmagan",
-    "chooseSize": "{{name}}: o'lchamni tanlang"
+    "chooseSize": "{{name}}: o'lchamni tanlang",
+    "deliveryHint": "Yuborish uchun telefon va manzilni kiriting"
   },
   "kitchen": {
     "minutes": "{{minutes}} daqiqa",
@@ -416,10 +434,12 @@
       "serviceCharge": "Xizmat haqi (%)",
       "serviceChargeHint": "Faqat \"Stolda\" buyurtmaga qo'shiladi. 0 bo'lsa olinmaydi.",
       "packagingFee": "Qadoq narxi (so'm)",
-      "packagingFeeHint": "Har bir \"Olib ketish\" buyurtmasiga bir marta qo'shiladi.",
+      "packagingFeeHint": "Har bir \"Olib ketish\" va \"Yetkazib berish\" buyurtmasiga bir marta qo'shiladi.",
       "percentInvalid": "0 dan 50 gacha butun son kiriting",
       "amountInvalid": "Summani butun son bilan kiriting",
-      "laterHint": "O'zgarish yangi buyurtmalarga qo'llanadi. Ochiq buyurtmalar eski narxlarida qoladi."
+      "laterHint": "O'zgarish yangi buyurtmalarga qo'llanadi. Ochiq buyurtmalar eski narxlarida qoladi.",
+      "deliveryFee": "Yetkazib berish narxi (so'm)",
+      "deliveryFeeHint": "Har bir yetkazib berish buyurtmasiga qo'shiladi. Qadoq narxi ham qo'shiladi."
     }
   },
   "shortcuts": {
@@ -430,7 +450,7 @@
     "searchProduct": "Taom qidiruviga o'tish",
     "addFirst": "Topilgan birinchi taomni savatga qo'shish",
     "chooseTable": "Stol tanlash",
-    "orderType": "Stolda yoki olib ketish",
+    "orderType": "Buyurtma turini almashtirish",
     "cartOrOrders": "Savat yoki faol buyurtmalar",
     "send": "Buyurtmani yuborish",
     "newDraft": "Keyingi mijozga o'tish"
@@ -519,5 +539,58 @@
     "edit": "{{name}} og'irligini o'zgartirish",
     "notWeighed": "Tortilmagan",
     "mustWeigh": "Tortilmagan taom bor: avval og'irligini kiriting"
+  },
+  "delivery": {
+    "phone": "Telefon",
+    "name": "Ismi",
+    "address": "Manzil",
+    "addressPlaceholder": "Manzil va mo'ljal",
+    "addressRequired": "Manzilni kiriting",
+    "editContact": "#{{number}}: mijoz ma'lumotlari",
+    "contact": "Mijoz ma'lumotlari",
+    "call": "Qo'ng'iroq qilish",
+    "turnedOff": "Yetkazib berish o'chirilgan. Uni yoqish uchun:",
+    "empty": "Hozir yetkazib berish buyurtmasi yo'q",
+    "groups": {
+      "waiting": "Kutilmoqda: qo'ng'iroq qiling",
+      "cooking": "Tayyorlanmoqda",
+      "ready": "Tayyor: kuryerga bering",
+      "onTheWay": "Yo'lda"
+    },
+    "waitingHint": "Mijozga qo'ng'iroq qilib buyurtmani aniqlashtiring. Kerak bo'lsa tarkibini o'zgartiring, keyin qabul qiling. Qabul qilinmaguncha oshxonaga bormaydi.",
+    "next": {
+      "ACCEPTED": "Qabul qilish",
+      "SERVED": "Kuryerga berildi"
+    },
+    "done": {
+      "ACCEPTED": "#{{number}} qabul qilindi va oshxonaga ketdi",
+      "SERVED": "#{{number}} yo'lga chiqdi"
+    },
+    "delivered": "Yetkazildi: to'lov",
+    "changeItems": "Tarkibini o'zgartirish"
+  },
+  "location": {
+    "title": "Xaritada manzil",
+    "hint": "Xaritada bosing yoki mijoz yuborgan Yandex/Google xarita havolasini joylang. Belgini surib aniqlashtirish mumkin.",
+    "link": "Xarita havolasi yoki koordinata",
+    "linkPlaceholder": "Havola yoki 41.31, 69.24",
+    "put": "Qo'yish",
+    "unreadable": "Bu havoladan nuqtani o'qib bo'lmadi. Qisqa havolani brauzerda ochib, to'liq havolani nusxalang yoki xaritada bosing.",
+    "map": "Xarita: nuqtani belgilash uchun bosing",
+    "tapHint": "Nuqta tanlanmagan: xaritada bosing",
+    "remove": "Nuqtani olib tashlash",
+    "confirm": "Tasdiqlash",
+    "pick": "Xaritadan belgilash",
+    "picked": "Xaritada belgilangan",
+    "change": "O'zgartirish",
+    "yandexMaps": "Yandex Xarita",
+    "yandexNavigator": "Navigator",
+    "google": "Google",
+    "qr": "Kuryer uchun QR",
+    "qrTitle": "#{{number}}: kuryer uchun",
+    "qrHint": "Kuryer telefoni kamerasi bilan skanerlasin: Yandex Xaritada yo'l ochiladi.",
+    "share": "Kuryerga yuborish",
+    "copied": "Kuryer uchun matn nusxalandi",
+    "noPoint": "Xaritada nuqta yo'q"
   }
 }

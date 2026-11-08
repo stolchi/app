@@ -6,12 +6,20 @@
  */
 import type { CreateOrderItemDto } from './createOrderItemDto';
 import type { CreatePublicOrderDtoType } from './createPublicOrderDtoType';
+import type { LocationDto } from './locationDto';
 
 export interface CreatePublicOrderDto {
   items: CreateOrderItemDto[];
   note?: string;
   customerName?: string;
   customerPhone?: string;
+  /**
+     * Where to deliver, with a landmark. Required for DELIVERY.
+     * @maxLength 500
+     */
+  address?: string;
+  /** Where to deliver, on the map. Only for DELIVERY. */
+  location?: LocationDto;
   type: CreatePublicOrderDtoType;
   /** The scanned table's token. Required for DINE_IN. */
   qrToken?: string;

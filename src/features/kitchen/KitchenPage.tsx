@@ -62,8 +62,9 @@ const COLUMNS: readonly Column[] = [
     id: 'new',
     icon: Bell,
     accent: 'bg-primary/15 text-primary',
-    statuses: [NEW, ACCEPTED],
-    target: NEW,
+    // NEW is a delivery nobody has accepted yet: not the kitchen's to cook.
+    statuses: [ACCEPTED],
+    target: ACCEPTED,
     moveTo: COOKING,
   },
   {
@@ -326,7 +327,10 @@ export function KitchenPage() {
   // Oldest first: they have been waiting the longest.
   const shown = orders.data.items
     // An order of drinks alone has nothing for the kitchen to do.
-    .filter((order) => order.items.some((item) => item.sendsToKitchen))
+    .filter(
+      (order) =>
+        order.status !== NEW && order.items.some((item) => item.sendsToKitchen),
+    )
     .map((order) => ({ ...order, status: moving[order.id] ?? order.status }))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   const dragged = shown.find(({ id }) => id === draggingId);

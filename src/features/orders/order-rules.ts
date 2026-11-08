@@ -64,3 +64,12 @@ export const mayCancel = (
 /** Food added from here on goes back to the kitchen. */
 export const isStarted = (status: OrderStatus) =>
   status === COOKING || status === READY || status === SERVED;
+
+/** The button that moves an order on. A delivery is not served: it is handed to a courier. */
+export const advanceLabel = (
+  type: OrderDto['type'],
+  status: OrderStatus,
+): string =>
+  type === 'DELIVERY' && status === SERVED
+    ? 'orders.deliveryAdvance.SERVED'
+    : `orders.advance.${status}`;

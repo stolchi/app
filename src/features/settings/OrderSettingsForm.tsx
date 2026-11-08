@@ -11,8 +11,6 @@ import { FormField } from '@/shared/ui/FormField';
 import { SavedNote, useCafeMutationOptions } from './settings-parts';
 
 const ALL_TYPES: readonly OrderType[] = ['DINE_IN', 'TAKEAWAY', 'DELIVERY'];
-/** Delivery joins this list once the till can take a delivery order. */
-const EDITABLE_TYPES: readonly OrderType[] = ['DINE_IN', 'TAKEAWAY'];
 
 const MAX_MONEY = 2_000_000_000;
 
@@ -29,6 +27,9 @@ export function OrderSettingsForm({ cafe }: { cafe: CafeDto }) {
   const [packaging, setPackaging] = useState(
     formatAmountInput(cafe.packagingFee),
   );
+  const [deliveryFee, setDeliveryFee] = useState(
+    formatAmountInput(cafe.deliveryFee),
+  );
   const [checked, setChecked] = useState(false);
 
   const percentValue = parseWhole(percent);
@@ -41,6 +42,12 @@ export function OrderSettingsForm({ cafe }: { cafe: CafeDto }) {
     packagingValue === null || packagingValue > MAX_MONEY
       ? 'settings.orders.amountInvalid'
       : undefined;
+  const deliveryValue = parseWhole(deliveryFee);
+  const deliveryError =
+    deliveryValue === null || deliveryValue > MAX_MONEY
+      ? 'settings.orders.amountInvalid'
+      : undefined;
+  const delivers = types.includes('DELIVERY');
   const noType = types.length === 0;
 
   const toggle = (type: OrderType, on: boolean) =>
@@ -59,11 +66,13 @@ export function OrderSettingsForm({ cafe }: { cafe: CafeDto }) {
         event.preventDefault();
         setChecked(true);
         if (noType || percentError || packagingError) return;
+        if (delivers && deliveryError) return;
         update.mutate({
           data: {
             orderTypes: types,
             serviceChargePercent: percentValue ?? 0,
             packagingFee: packagingValue ?? 0,
+            ...(delivers && { deliveryFee: deliveryValue ?? 0 }),
           },
         });
       }}
@@ -73,7 +82,7 @@ export function OrderSettingsForm({ cafe }: { cafe: CafeDto }) {
           {t('settings.orders.types')}
         </legend>
         <div className="flex flex-wrap gap-x-6">
-          {EDITABLE_TYPES.map((type) => (
+          {ALL_TYPES.map((type) => (
             <Label key={type} className="flex h-11 items-center gap-3">
               <Checkbox
                 className="size-6"
@@ -115,6 +124,17 @@ export function OrderSettingsForm({ cafe }: { cafe: CafeDto }) {
           value={packaging}
           onChange={(event) => setPackaging(event.target.value)}
         />
+        {delivers && (
+          <FormField
+            id="delivery-fee"
+            label={t('settings.orders.deliveryFee')}
+            hint={t('settings.orders.deliveryFeeHint')}
+            inputMode="numeric"
+            error={checked ? deliveryError : undefined}
+            value={deliveryFee}
+            onChange={(event) => setDeliveryFee(event.target.value)}
+          />
+        )}
       </div>
       <p className="text-xs text-muted-foreground">
         {t('settings.orders.laterHint')}

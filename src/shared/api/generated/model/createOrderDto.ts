@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { CreateOrderItemDto } from './createOrderItemDto';
+import type { LocationDto } from './locationDto';
 import type { OrderType } from './orderType';
 
 export interface CreateOrderDto {
@@ -12,6 +13,13 @@ export interface CreateOrderDto {
   note?: string;
   customerName?: string;
   customerPhone?: string;
+  /**
+     * Where to deliver, with a landmark. Required for DELIVERY.
+     * @maxLength 500
+     */
+  address?: string;
+  /** Where to deliver, on the map. Only for DELIVERY. */
+  location?: LocationDto;
   type: OrderType;
   /** Required for DINE_IN, not allowed otherwise. */
   tableId?: string;

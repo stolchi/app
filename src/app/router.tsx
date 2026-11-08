@@ -51,6 +51,11 @@ const TablesPage = lazy(() =>
     default: m.TablesPage,
   })),
 );
+const DeliveryPage = lazy(() =>
+  import('@/features/delivery/DeliveryPage').then((m) => ({
+    default: m.DeliveryPage,
+  })),
+);
 const SettingsPage = lazy(() =>
   import('@/features/settings/SettingsPage').then((m) => ({
     default: m.SettingsPage,
@@ -145,6 +150,7 @@ export const router = createBrowserRouter([
           page('/waiter', <WaiterPage />),
           page('/kitchen', <KitchenPage />),
           page('/orders', <OrdersPage />),
+          page('/delivery', <DeliveryPage />),
           page('/menu', <MenuPage />),
           page('/tables', <TablesPage />),
           page('/staff', <StaffPage />),

@@ -10,6 +10,7 @@ import {
   Search,
   ShoppingBag,
   ShoppingCart,
+  Truck,
   UtensilsCrossed,
   X,
 } from 'lucide-react';
@@ -37,6 +38,7 @@ import type { OrderDto, ProductDto } from '@/shared/api/generated/model';
 import { ApiPath, invalidate } from '@/shared/api/invalidate';
 import { usePermissions, useSessionStore } from '@/shared/auth/session-store';
 import { playChime } from '@/shared/lib/chime';
+import { normalizePhone } from '@/shared/lib/phone';
 import { useShortcuts } from '@/shared/lib/use-shortcuts';
 import { formatMoney, formatTime } from '@/shared/lib/format';
 import { productPrice } from '@/shared/lib/product-price';
@@ -54,6 +56,7 @@ import { SoundHint } from '@/shared/ui/SoundHint';
 import { activeDraft, useActiveCart, useCartStore } from './cart-store';
 import { DraftTabs } from './DraftTabs';
 import { flyToCart } from './fly-to-cart';
+import { DeliveryFields, deliveryReady } from './DeliveryFields';
 import { useCartAmounts } from './use-cart-amounts';
 import { VariantPicker } from './VariantPicker';
 
@@ -174,7 +177,13 @@ function Cart({
   const { lines, offered, type, amounts } = useCartAmounts(cart, products);
   const soldOut = lines.filter(({ product }) => !product.isAvailable);
   const table = tables.find(({ id }) => id === cart.tableId);
-  const tableSelected = type === 'TAKEAWAY' || table !== undefined;
+  // Where it goes: a table, the counter, or an address.
+  const tableSelected =
+    type === 'DINE_IN'
+      ? table !== undefined
+      : type === 'DELIVERY'
+        ? deliveryReady(cart.customer)
+        : true;
   const canSend =
     type !== undefined &&
     lines.length > 0 &&
@@ -191,6 +200,16 @@ function Cart({
         data: {
           type,
           ...(type === 'DINE_IN' && { tableId: cart.tableId }),
+          ...(type === 'DELIVERY' && {
+            customerPhone: normalizePhone(cart.customer.phone),
+            address: cart.customer.address.trim(),
+            ...(cart.customer.location && {
+              location: cart.customer.location,
+            }),
+            ...(cart.customer.name.trim() && {
+              customerName: cart.customer.name.trim(),
+            }),
+          }),
           items: lines.map(({ productId, variantId, quantity, note }) => ({
             productId,
             ...(variantId && { variantId }),
@@ -216,8 +235,8 @@ function Cart({
       if (type === 'DINE_IN') setPickingTable(true);
     },
     t: () => {
-      if (offered.length > 1) {
-        cart.setType(type === 'DINE_IN' ? 'TAKEAWAY' : 'DINE_IN');
+      if (offered.length > 1 && type) {
+        cart.setType(offered[(offered.indexOf(type) + 1) % offered.length]);
       }
     },
     n: cart.startNew,
@@ -236,13 +255,26 @@ function Cart({
             options={offered.map((value) => ({
               value,
               label: t(`orders.type.${value}`),
-              icon: value === 'DINE_IN' ? <UtensilsCrossed /> : <ShoppingBag />,
+              icon:
+                value === 'DINE_IN' ? (
+                  <UtensilsCrossed />
+                ) : value === 'DELIVERY' ? (
+                  <Truck />
+                ) : (
+                  <ShoppingBag />
+                ),
             }))}
             itemClassName="flex-1"
           />
         )}
         {!type && (
           <p className="text-sm text-destructive">{t('pos.noOrderTypes')}</p>
+        )}
+        {type === 'DELIVERY' && (
+          <DeliveryFields
+            customer={cart.customer}
+            onChange={cart.setCustomer}
+          />
         )}
         {type === 'DINE_IN' && (
           <Button
@@ -388,7 +420,9 @@ function Cart({
         </Button>
         {lines.length > 0 && !tableSelected && (
           <p className="text-center text-sm text-muted-foreground">
-            {t('pos.chooseTableHint')}
+            {t(
+              type === 'DELIVERY' ? 'pos.deliveryHint' : 'pos.chooseTableHint',
+            )}
           </p>
         )}
       </div>

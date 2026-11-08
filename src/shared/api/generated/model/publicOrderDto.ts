@@ -23,6 +23,11 @@ export interface PublicOrderDto {
   displayNumber: string;
   status: OrderStatus;
   type: OrderType;
+  /**
+     * Why it was cancelled.
+     * @nullable
+     */
+  cancelReason: string | null;
   createdAt: string;
   items: PublicOrderItemDto[];
 }

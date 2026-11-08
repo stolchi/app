@@ -4,7 +4,11 @@ import { amountsOf, chargesFor } from '@/shared/lib/order-charges';
 import { lineTotal } from '@/shared/lib/quantity';
 import type { CartDraft, CartLine, CartOrderType } from './cart-store';
 
-const TILL_TYPES: readonly CartOrderType[] = ['DINE_IN', 'TAKEAWAY'];
+const TILL_TYPES: readonly CartOrderType[] = [
+  'DINE_IN',
+  'TAKEAWAY',
+  'DELIVERY',
+];
 const NO_CHARGES = { serviceChargePercent: 0, packagingFee: 0, deliveryFee: 0 };
 
 /**

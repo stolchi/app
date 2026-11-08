@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowRightLeft, Pencil } from 'lucide-react';
+import { ArrowRightLeft, Pencil, UserPen } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  useOrdersControllerCancel,
   useOrdersControllerChangeStatus,
   useOrdersControllerClose,
   useOrdersControllerGet,
@@ -23,7 +22,6 @@ import { lineTotal, quantityLabel } from '@/shared/lib/quantity';
 import { formatDateTime, formatMoney } from '@/shared/lib/format';
 import { useHeldValue } from '@/shared/lib/use-held-value';
 import { celebrate } from '@/shared/ui/Celebration';
-import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { ErrorText } from '@/shared/ui/ErrorText';
 import { QueryState } from '@/shared/ui/QueryState';
 import {
@@ -32,8 +30,12 @@ import {
   mayEdit,
   maySetStatus,
   mayTakePayment,
+  advanceLabel,
   nextStatus,
 } from './order-rules';
+import { CancelOrderDialog } from './CancelOrderDialog';
+import { ContactDialog } from './ContactDialog';
+import { CustomerDetails } from './CustomerDetails';
 import { OrderAmounts } from './OrderAmounts';
 import { OrderEditDialog } from './OrderEditDialog';
 import { PaymentDialog } from './PaymentDialog';
@@ -55,6 +57,7 @@ function OrderActions({
   const [cancelling, setCancelling] = useState(false);
   const [moving, setMoving] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [editingContact, setEditingContact] = useState(false);
 
   // On failure too: a conflict means this screen is behind someone else's change.
   const mutation = {
@@ -65,7 +68,6 @@ function OrderActions({
   };
   const changeStatus = useOrdersControllerChangeStatus(mutation);
   const close = useOrdersControllerClose(mutation);
-  const cancel = useOrdersControllerCancel(mutation);
   const moveTo = useOrdersControllerMoveToTable(mutation);
 
   const unpaid = order.total - order.paidAmount;
@@ -95,7 +97,7 @@ function OrderActions({
               changeStatus.mutate({ id: order.id, data: { status: next } })
             }
           >
-            {t(`orders.advance.${next}`)}
+            {t(advanceLabel(order.type, next))}
           </Button>
         )}
         {mayTakePayment(permissions) && unpaid > 0 && (
@@ -131,6 +133,16 @@ function OrderActions({
           >
             <Pencil />
             {t('orders.edit.action')}
+          </Button>
+        )}
+        {mayEdit(permissions) && (
+          <Button
+            variant="outline"
+            className="h-12 text-base"
+            onClick={() => setEditingContact(true)}
+          >
+            <UserPen />
+            {t('delivery.contact')}
           </Button>
         )}
         {order.type === 'DINE_IN' && mayEdit(permissions) && (
@@ -174,26 +186,15 @@ function OrderActions({
           );
         }}
       />
-      <ConfirmDialog
+      <CancelOrderDialog
+        order={order}
         open={cancelling}
         onOpenChange={setCancelling}
-        title={t('orders.cancelTitle', { number: order.displayNumber })}
-        description={
-          order.paidAmount > 0
-            ? t('orders.cancelPaidWarning', {
-                amount: formatMoney(order.paidAmount),
-              })
-            : undefined
-        }
-        confirmLabel={t('orders.cancel')}
-        pending={cancel.isPending}
-        error={cancel.error}
-        onConfirm={() =>
-          cancel.mutate(
-            { id: order.id },
-            { onSuccess: () => setCancelling(false) },
-          )
-        }
+      />
+      <ContactDialog
+        order={order}
+        open={editingContact}
+        onOpenChange={setEditingContact}
       />
     </div>
   );
@@ -207,15 +208,16 @@ function OrderBody({ order }: { order: OrderDto }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <StatusBadge status={order.status} />
+        <StatusBadge status={order.status} type={order.type} />
         <SourceBadge source={order.source} />
         <span>{placeOf(order)}</span>
         <span>· {t(`orders.source.${order.source}`)}</span>
         <span>· {formatDateTime(order.createdAt)}</span>
       </div>
-      {(order.customerName || order.customerPhone) && (
-        <p className="text-sm">
-          {[order.customerName, order.customerPhone].filter(Boolean).join(', ')}
+      <CustomerDetails order={order} />
+      {order.status === 'CANCELLED' && order.cancelReason && (
+        <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
+          {t('orders.cancelledBecause', { reason: order.cancelReason })}
         </p>
       )}
       <ul className="divide-y rounded-lg border">

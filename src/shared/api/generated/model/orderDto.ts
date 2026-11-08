@@ -4,6 +4,7 @@
  * Stolchi API
  * OpenAPI spec version: 1.0
  */
+import type { LocationDto } from './locationDto';
 import type { OrderItemDto } from './orderItemDto';
 import type { OrderSource } from './orderSource';
 import type { OrderStatus } from './orderStatus';
@@ -34,6 +35,12 @@ export interface OrderDto {
   customerName: string | null;
   /** @nullable */
   customerPhone: string | null;
+  /** @nullable */
+  address: string | null;
+  /** @nullable */
+  location: LocationDto | null;
+  /** @nullable */
+  cancelReason: string | null;
   paidAmount: number;
   /** @nullable */
   note: string | null;
